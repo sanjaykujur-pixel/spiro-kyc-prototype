@@ -203,7 +203,7 @@ a{color:var(--spiro-green);text-decoration:none;cursor:pointer}a:hover{text-deco
       <div>Spiro <span class="brand-sub">· KYC V2 · Internal Portal</span></div>
     </div>
     <div class="nav-links">
-      <a class="nav-link" onclick="modal('What\\'s in this prototype', `<p class=text-sm style=margin-bottom:12px>A front-end demo of the V2 KYC flow for Spiro asset financing.</p><p class=text-sm style=margin-bottom:12px><strong>4 roles</strong> in the sidebar — click any to expand its sub-views.</p><p class=text-sm style=margin-bottom:12px><strong>Form validation</strong> runs on the New lead and CX data form views with live regex feedback.</p><p class=text-sm>Source: Asset Financing — PRDs.pdf. All data is illustrative; no real API calls.</p>`)">About</a>
+      <a class="nav-link" onclick="modal('What\'s in this prototype', `<p class=text-sm style=margin-bottom:12px>A front-end demo of the V2 KYC flow for Spiro asset financing.</p><p class=text-sm style=margin-bottom:12px><strong>4 roles</strong> in the sidebar — click any to expand its sub-views.</p><p class=text-sm style=margin-bottom:12px><strong>Form validation</strong> runs on the New lead and CX data form views with live regex feedback.</p><p class=text-sm>Source: Asset Financing — PRDs.pdf. All data is illustrative; no real API calls.</p>`)">About</a>
       <a class="nav-link" href="https://github.com/sanjaykujur-pixel/spiro-kyc-prototype" target="_blank">GitHub ↗</a>
     </div>
   </div>
@@ -593,7 +593,7 @@ VIEW_INIT['agent-lead'] = ()=>{
   attachValidation('leadForm');
   const HINTS = {
     app:    'Default for in-branch capture · full digital form + photo',
-    web:    'Browser fallback when the Agent App can\\'t be used',
+    web:    'Browser fallback when the Agent App can\'t be used',
     ussd:   'Low-bandwidth · *255*1# collects basic info; biometric captured later at a swap station',
     assist: 'Agent reads questions over phone · for riders without smartphones'
   };
@@ -1534,8 +1534,8 @@ VIEWS['ops-api'] = ()=>`
     ${apiCard('Adara webhook (Union)','Union UG',96.1,2.1,'warn')}
     ${apiCard('ML risk model','Spiro internal',100,0.9,'good')}
     ${apiCard('Spiro DB write','Spiro internal',100,0.06,'good')}
-    ${apiCard('SMS gateway','Africa\\'s Talking',99.9,0.4,'good')}
-    ${apiCard('USSD gateway','Africa\\'s Talking',99.2,0.7,'good')}
+    ${apiCard('SMS gateway','Africa\'s Talking',99.9,0.4,'good')}
+    ${apiCard('USSD gateway','Africa\'s Talking',99.2,0.7,'good')}
   </div>
 
   <div class="card">
@@ -1716,7 +1716,7 @@ function journeyStep(n, label, kind, sub){
   return `<div style="display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--border);border-left:4px solid ${color};border-radius:8px;background:var(--surface);cursor:grab;" onmouseover="this.style.boxShadow='var(--shadow)'" onmouseout="this.style.boxShadow=''"><div style="font-family:'Poppins';font-weight:700;color:var(--text-muted);width:24px;text-align:center;">${n}</div><div style="flex:1;"><div class="text-sm fw-600">${label}</div><div class="text-xs muted">${sub}</div></div><span class="badge" style="color:${color};background:${kind==='required'?'var(--spiro-green-light)':kind==='conditional'?'var(--warning-bg)':'var(--bg)'};">${chip}</span><span style="color:var(--text-faint);cursor:grab;">⋮⋮</span></div>`;
 }
 function addStep(label, sub){
-  return `<div style="padding:10px;border:1px dashed var(--border);border-radius:8px;cursor:grab;" onclick="toast('Drag '+`${label}`+' into the journey','')"><div class="text-sm fw-600">+ ${label}</div><div class="text-xs muted">${sub}</div></div>`;
+  return `<div style="padding:10px;border:1px dashed var(--border);border-radius:8px;cursor:grab;" onclick="toast('Drag ${label} into the journey','')"><div class="text-sm fw-600">+ ${label}</div><div class="text-xs muted">${sub}</div></div>`;
 }
 
 /* ================ NEW COMPLIANCE VIEW ================ */
