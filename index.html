@@ -1,0 +1,1295 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Spiro KYC Prototype — V2</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+<style>
+:root{--spiro-green:#00875A;--spiro-green-dark:#0A5A3D;--spiro-green-light:#E6F4EE;--spiro-blue:#1A56DB;--bg:#F7F9FA;--surface:#FFFFFF;--border:#E5EAE7;--text:#1A1F1C;--text-muted:#5A6B65;--text-faint:#8B9994;--success:#10B981;--success-bg:#ECFDF5;--warning:#F59E0B;--warning-bg:#FFFBEB;--danger:#EF4444;--danger-bg:#FEF2F2;--info:#3B82F6;--info-bg:#EFF6FF;--fs-xs:12px;--fs-sm:13px;--fs-base:14px;--fs-md:15px;--fs-lg:17px;--fs-xl:20px;--fs-2xl:24px;--fs-3xl:32px;--radius-sm:6px;--radius:10px;--radius-lg:14px;--shadow-sm:0 1px 2px rgba(15,23,42,.04);--shadow:0 2px 6px rgba(15,23,42,.06);--shadow-lg:0 8px 24px rgba(15,23,42,.08)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{font-family:'Lato',-apple-system,sans-serif;font-size:var(--fs-base);line-height:1.5;color:var(--text);background:var(--bg);-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4,h5{font-family:'Poppins',sans-serif;font-weight:600;letter-spacing:-.01em;color:var(--text)}
+h1{font-size:var(--fs-3xl)}h2{font-size:var(--fs-2xl)}h3{font-size:var(--fs-xl)}h4{font-size:var(--fs-lg)}h5{font-size:var(--fs-md)}
+a{color:var(--spiro-green);text-decoration:none;cursor:pointer}a:hover{text-decoration:underline}
+.topnav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;position:sticky;top:0;z-index:50}
+.topnav-inner{display:flex;align-items:center;justify-content:space-between;max-width:1440px;margin:0 auto;height:60px}
+.brand{display:flex;align-items:center;gap:12px;font-family:'Poppins',sans-serif;font-weight:600;font-size:var(--fs-lg);color:var(--text);cursor:pointer}
+.brand-mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--spiro-green) 0%,var(--spiro-green-dark) 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:14px}
+.brand-sub{color:var(--text-muted);font-weight:400;font-size:var(--fs-sm)}
+.nav-links{display:flex;gap:4px}
+.nav-link{font-size:var(--fs-sm);color:var(--text-muted);padding:8px 12px;border-radius:var(--radius-sm);cursor:pointer}
+.nav-link:hover{background:var(--bg);color:var(--text);text-decoration:none}
+.nav-link.active{color:var(--spiro-green);background:var(--spiro-green-light)}
+.container{max-width:1280px;margin:0 auto;padding:32px 24px}
+.page-header{margin-bottom:32px}
+.page-title{font-size:var(--fs-2xl);margin-bottom:8px}
+.page-subtitle{color:var(--text-muted);font-size:var(--fs-md)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow-sm)}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.card-title{font-size:var(--fs-lg)}.card-sub{font-size:var(--fs-sm);color:var(--text-muted)}
+.grid{display:grid;gap:20px}.grid-2{grid-template-columns:repeat(2,1fr)}.grid-3{grid-template-columns:repeat(3,1fr)}.grid-4{grid-template-columns:repeat(4,1fr)}
+@media (max-width:900px){.grid-3,.grid-4{grid-template-columns:1fr 1fr}.grid-2{grid-template-columns:1fr}}
+.btn{font-family:'Lato',sans-serif;font-size:var(--fs-sm);font-weight:700;padding:10px 16px;border-radius:var(--radius-sm);border:1px solid transparent;cursor:pointer;display:inline-flex;align-items:center;gap:8px;text-decoration:none}
+.btn-primary{background:var(--spiro-green);color:#fff}.btn-primary:hover{background:var(--spiro-green-dark);text-decoration:none}
+.btn-primary:disabled{background:var(--border);color:var(--text-faint);cursor:not-allowed}
+.btn-secondary{background:var(--surface);color:var(--text);border-color:var(--border)}.btn-secondary:hover{background:var(--bg);text-decoration:none}
+.btn-ghost{background:transparent;color:var(--text-muted)}.btn-danger{background:var(--danger);color:#fff}
+.btn-block{width:100%;justify-content:center}.btn-lg{padding:14px 20px;font-size:var(--fs-base)}.btn-sm{padding:6px 10px;font-size:var(--fs-xs)}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:var(--fs-xs);font-weight:600;padding:3px 8px;border-radius:999px;background:var(--bg);color:var(--text-muted)}
+.badge-success{background:var(--success-bg);color:var(--success)}
+.badge-warning{background:var(--warning-bg);color:var(--warning)}
+.badge-danger{background:var(--danger-bg);color:var(--danger)}
+.badge-info{background:var(--info-bg);color:var(--info)}
+.badge-green{background:var(--spiro-green-light);color:var(--spiro-green-dark)}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:16px;position:relative}
+.field-label{font-size:var(--fs-sm);font-weight:600;color:var(--text)}
+.field-label .req{color:var(--danger);margin-left:2px}
+.field-hint{font-size:var(--fs-xs);color:var(--text-faint)}
+.field-msg{font-size:var(--fs-xs);min-height:14px}
+.field-msg.ok{color:var(--success)}
+.field-msg.err{color:var(--danger)}
+.input,.select,.textarea{font-family:'Lato',sans-serif;font-size:var(--fs-base);padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--surface);color:var(--text);width:100%}
+.input:focus,.select:focus,.textarea:focus{outline:none;border-color:var(--spiro-green);box-shadow:0 0 0 3px rgba(0,135,90,.12)}
+.input.valid{border-color:var(--success)}
+.input.invalid{border-color:var(--danger);box-shadow:0 0 0 3px rgba(239,68,68,.08)}
+.toggle{display:inline-flex;gap:8px;align-items:center}
+.toggle-switch{width:36px;height:20px;background:var(--border);border-radius:999px;position:relative;cursor:pointer}
+.toggle-switch::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;background:#fff;border-radius:50%;box-shadow:var(--shadow-sm);transition:transform .15s}
+.toggle-switch.on{background:var(--spiro-green)}
+.toggle-switch.on::after{transform:translateX(16px)}
+.table{width:100%;border-collapse:collapse;font-size:var(--fs-sm)}
+.table th,.table td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--border)}
+.table th{font-weight:600;color:var(--text-muted);background:var(--bg);font-size:var(--fs-xs);text-transform:uppercase;letter-spacing:.04em}
+.table tr:hover td{background:var(--bg)}
+.table-compact th,.table-compact td{padding:8px 12px}
+.phone-frame{width:340px;height:680px;background:#1A1F1C;border-radius:32px;padding:10px;box-shadow:var(--shadow-lg);margin:0 auto}
+.phone-screen{width:100%;height:100%;background:var(--surface);border-radius:22px;overflow:hidden;display:flex;flex-direction:column}
+.phone-statusbar{height:28px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-size:10px;font-weight:600;background:var(--surface)}
+.phone-header{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px}
+.phone-title{font-family:'Poppins',sans-serif;font-weight:600;font-size:var(--fs-md)}
+.phone-body{flex:1;overflow-y:auto;padding:16px}
+.phone-footer{padding:12px 16px;border-top:1px solid var(--border)}
+.phone-body::-webkit-scrollbar{width:4px}.phone-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+.timeline{padding-left:0;list-style:none}
+.timeline-item{display:flex;gap:14px;padding-bottom:18px;position:relative}
+.timeline-item:not(:last-child)::before{content:'';position:absolute;left:11px;top:26px;bottom:0;width:2px;background:var(--border)}
+.timeline-dot{width:24px;height:24px;border-radius:50%;background:var(--surface);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0;z-index:1;color:var(--text-faint)}
+.timeline-dot.done{background:var(--spiro-green);border-color:var(--spiro-green);color:#fff}
+.timeline-dot.active{background:#fff;border-color:var(--spiro-green);color:var(--spiro-green);box-shadow:0 0 0 4px var(--spiro-green-light)}
+.timeline-title{font-size:var(--fs-sm);font-weight:600}
+.timeline-meta{font-size:var(--fs-xs);color:var(--text-muted);margin-top:2px}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.kpi-label{font-size:var(--fs-xs);color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;font-weight:600}
+.kpi-value{font-family:'Poppins',sans-serif;font-size:var(--fs-2xl);font-weight:600;margin-top:4px}
+.kpi-delta{font-size:var(--fs-xs);margin-top:6px}
+.kpi-delta.up{color:var(--success)}.kpi-delta.down{color:var(--danger)}
+.persona-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px;cursor:pointer;display:flex;flex-direction:column;gap:12px;text-decoration:none;color:inherit}
+.persona-card:hover{border-color:var(--spiro-green);box-shadow:var(--shadow);text-decoration:none;transform:translateY(-2px)}
+.persona-icon{width:44px;height:44px;border-radius:10px;background:var(--spiro-green-light);color:var(--spiro-green-dark);display:flex;align-items:center;justify-content:center;font-size:20px}
+.persona-title{font-size:var(--fs-lg)}
+.persona-desc{font-size:var(--fs-sm);color:var(--text-muted)}
+.persona-meta{font-size:var(--fs-xs);color:var(--text-faint);margin-top:auto;padding-top:12px;border-top:1px solid var(--border)}
+.portal-layout{display:grid;grid-template-columns:260px 1fr;min-height:calc(100vh - 60px)}
+.portal-sidebar{background:var(--surface);border-right:1px solid var(--border);padding:16px 12px;overflow-y:auto}
+.portal-user{background:var(--bg);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:12px;display:flex;align-items:center;gap:10px}
+.portal-avatar{width:32px;height:32px;border-radius:50%;background:var(--spiro-green);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;font-family:'Poppins',sans-serif}
+.portal-user-name{font-size:var(--fs-sm);font-weight:600}
+.portal-user-role{font-size:var(--fs-xs);color:var(--text-muted)}
+.role-group{margin-bottom:4px}
+.role-header{display:flex;align-items:center;gap:8px;padding:9px 12px;cursor:pointer;border-radius:var(--radius-sm);font-size:var(--fs-sm);font-weight:600;color:var(--text)}
+.role-header:hover{background:var(--bg)}
+.role-header.active{background:var(--spiro-green-light);color:var(--spiro-green-dark)}
+.role-icon{width:18px;text-align:center}
+.role-chevron{margin-left:auto;font-size:10px;color:var(--text-muted);transition:transform .15s}
+.role-group.open .role-chevron{transform:rotate(90deg)}
+.role-items{display:none;padding:2px 0 6px 36px}
+.role-group.open .role-items{display:block}
+.role-item{display:block;padding:7px 12px;font-size:var(--fs-sm);color:var(--text-muted);border-radius:var(--radius-sm);cursor:pointer;text-decoration:none}
+.role-item:hover{background:var(--bg);color:var(--text);text-decoration:none}
+.role-item.active{background:var(--spiro-green-light);color:var(--spiro-green-dark);font-weight:600}
+.portal-main{padding:24px 32px;overflow-y:auto;max-width:1180px}
+.view{display:none}.view.active{display:block}
+.view-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.crumb{font-size:var(--fs-xs);color:var(--text-muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em;font-weight:600}
+.view-title{font-size:var(--fs-xl)}
+.view-sub{font-size:var(--fs-sm);color:var(--text-muted);margin-top:4px}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--border);margin-bottom:20px}
+.tab{padding:10px 14px;font-size:var(--fs-sm);font-weight:600;color:var(--text-muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--spiro-green);border-bottom-color:var(--spiro-green)}
+.alert{display:flex;gap:12px;padding:12px 16px;border-radius:var(--radius-sm);font-size:var(--fs-sm);margin-bottom:16px}
+.alert-info{background:var(--info-bg);color:var(--info);border-left:3px solid var(--info)}
+.alert-success{background:var(--success-bg);color:#047857;border-left:3px solid var(--success)}
+.alert-warning{background:var(--warning-bg);color:#B45309;border-left:3px solid var(--warning)}
+.alert-danger{background:var(--danger-bg);color:#B91C1C;border-left:3px solid var(--danger)}
+.risk-bar{height:8px;border-radius:999px;background:linear-gradient(to right,var(--success) 0%,var(--success) 30%,var(--warning) 30%,var(--warning) 60%,var(--danger) 60%,var(--danger) 100%);position:relative;margin:12px 0}
+.risk-pointer{position:absolute;top:-4px;width:4px;height:16px;background:var(--text);border-radius:2px;transform:translateX(-50%)}
+.risk-legend{display:flex;justify-content:space-between;font-size:var(--fs-xs);color:var(--text-muted)}
+.muted{color:var(--text-muted)}.faint{color:var(--text-faint)}
+.flex{display:flex}.flex-col{display:flex;flex-direction:column}
+.gap-2{gap:8px}.gap-3{gap:12px}.gap-4{gap:16px}
+.items-center{align-items:center}.justify-between{justify-content:space-between}
+.mt-2{margin-top:8px}.mt-3{margin-top:12px}.mt-4{margin-top:16px}.mt-6{margin-top:24px}
+.mb-2{margin-bottom:8px}.mb-3{margin-bottom:12px}.mb-4{margin-bottom:16px}.mb-6{margin-bottom:24px}
+.text-center{text-align:center}.text-xs{font-size:var(--fs-xs)}.text-sm{font-size:var(--fs-sm)}.text-lg{font-size:var(--fs-lg)}
+.fw-600{font-weight:600}.fw-700{font-weight:700}
+.divider{height:1px;background:var(--border);margin:16px 0}
+.outcome{border-radius:var(--radius);padding:20px;margin-bottom:16px}
+.outcome-pass{background:var(--success-bg);border:1px solid #BBF7D0}
+.outcome-refer{background:var(--warning-bg);border:1px solid #FED7AA}
+.outcome-fail{background:var(--danger-bg);border:1px solid #FECACA}
+.outcome-title{font-family:'Poppins',sans-serif;font-weight:600;font-size:var(--fs-md);margin-bottom:4px}
+.case-row{cursor:pointer}.case-row.selected td{background:var(--spiro-green-light)}
+.case-id{font-family:'Poppins',sans-serif;font-weight:600;color:var(--spiro-green-dark)}
+.factor-card{border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px}
+.factor-card.negative{border-left:3px solid var(--danger)}
+.factor-card.positive{border-left:3px solid var(--success)}
+.factor-card.neutral{border-left:3px solid var(--warning)}
+.factor-weight{height:4px;background:var(--bg);border-radius:2px;margin-top:8px;overflow:hidden}
+.factor-weight-fill{height:100%}
+.heat-cell{aspect-ratio:1;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff}
+.config-row{display:grid;grid-template-columns:1.4fr 1fr .6fr;gap:16px;padding:14px 0;border-bottom:1px solid var(--border);align-items:center}
+.config-row:last-child{border-bottom:none}
+.config-title{font-size:var(--fs-sm);font-weight:600}
+.config-desc{font-size:var(--fs-xs);color:var(--text-muted);margin-top:2px}
+.config-default{font-size:var(--fs-xs);color:var(--text-faint);margin-top:2px}
+.slider-track{position:relative;height:6px;background:var(--border);border-radius:3px}
+.slider-fill{position:absolute;height:6px;background:var(--spiro-green);border-radius:3px}
+.slider-thumb{position:absolute;top:-5px;width:16px;height:16px;background:#fff;border:2px solid var(--spiro-green);border-radius:50%;transform:translateX(-50%)}
+.sms-bubble{background:#E5EAE7;border-radius:16px 16px 16px 4px;padding:12px 14px;max-width:260px;font-size:13px;margin-bottom:8px}
+.sms-meta{font-size:10px;color:var(--text-faint);margin-bottom:4px}
+.sms-sender{font-weight:600;font-size:11px;color:var(--spiro-green-dark);margin-bottom:2px}
+.bias-bar{height:8px;background:var(--bg);border-radius:4px;overflow:hidden;margin-top:6px}
+.bias-bar-fill{height:100%;background:var(--success)}
+.bias-bar-fill.warn{background:var(--warning)}
+.market-card{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--border);border-radius:var(--radius-sm)}
+.flag{font-size:22px}
+.section{display:none}.section.active{display:block}
+.steps{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+.step-dot{flex:1;height:4px;background:var(--border);border-radius:2px}
+.step-dot.done,.step-dot.active{background:var(--spiro-green)}
+.step-label{font-size:var(--fs-xs);color:var(--text-muted);margin-bottom:16px}
+.phone-grid{display:flex;gap:32px;flex-wrap:wrap;justify-content:center;padding:16px 0}
+.phone-wrap{position:relative;padding-top:28px}
+.screen-label{position:absolute;top:-28px;left:0;font-size:var(--fs-xs);color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media (max-width:800px){.form-grid{grid-template-columns:1fr}}
+.checklist{list-style:none;padding:0}
+.checklist li{display:flex;gap:8px;align-items:flex-start;padding:6px 0;font-size:var(--fs-sm)}
+.check-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;margin-top:2px}
+.check-dot.ok{background:var(--success);border-color:var(--success);color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center}
+.check-dot.err{background:var(--danger);border-color:var(--danger);color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div class="topnav-inner">
+    <div class="brand" onclick="showSection('hub')">
+      <div class="brand-mark">S</div>
+      <div>Spiro <span class="brand-sub">· KYC V2 Prototype</span></div>
+    </div>
+    <div class="nav-links">
+      <a class="nav-link active" data-nav="hub" onclick="showSection('hub')">Overview</a>
+      <a class="nav-link" data-nav="portal" onclick="showSection('portal')">Internal Portal</a>
+      <a class="nav-link" data-nav="rider" onclick="showSection('rider')">Rider experience</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ============== HUB ============== -->
+<section id="section-hub" class="section active">
+<div class="container">
+  <div class="page-header">
+    <div class="badge badge-green mb-3">V2 — KYC Flow Prototype</div>
+    <h1 class="page-title">Spiro-owned digital KYC, end-to-end</h1>
+    <p class="page-subtitle">One internal portal for Spiro & Financier teams · one rider-facing experience. Click into either to walk the flow.</p>
+  </div>
+
+  <div class="grid grid-2 mb-6">
+    <a class="persona-card" onclick="showSection('portal')">
+      <div class="persona-icon">🖥️</div>
+      <h3 class="persona-title">Internal Portal</h3>
+      <div class="persona-desc">A single role-based portal for everyone inside Spiro and partner financiers. Sub-roles in the sidebar surface different views and tasks per role.</div>
+      <div class="persona-meta">4 roles · 18 sub-views · validation + failure paths</div>
+    </a>
+    <a class="persona-card" onclick="showSection('rider')">
+      <div class="persona-icon">🛵</div>
+      <h3 class="persona-title">Rider experience</h3>
+      <div class="persona-desc">End customer touchpoints — SMS thread, in-app status, under-review and declined states.</div>
+      <div class="persona-meta">4 notification states · cross-channel</div>
+    </a>
+  </div>
+
+  <div class="card mb-6">
+    <div class="card-header"><div><h3 class="card-title">Roles in the Internal Portal</h3><div class="card-sub">Sidebar groups each role's sub-views</div></div></div>
+    <div class="grid grid-4">
+      <div><div class="text-xs muted fw-600" style="text-transform:uppercase;">📱 Swap Agent</div><ul class="checklist mt-2"><li>Dashboard</li><li>New lead</li><li>CX data form</li><li>KYC verification</li><li>My applications</li></ul></div>
+      <div><div class="text-xs muted fw-600" style="text-transform:uppercase;">🛡 Spiro Ops</div><ul class="checklist mt-2"><li>Review queue</li><li>Refer queue</li><li>Webhook failures</li><li>Geo-risk heat map</li><li>ML model health</li></ul></div>
+      <div><div class="text-xs muted fw-600" style="text-transform:uppercase;">⚙ Financier Admin</div><ul class="checklist mt-2"><li>Identity & KYC config</li><li>Risk & decisioning</li><li>Roles & approvals</li><li>Webhook config</li><li>Change history</li></ul></div>
+      <div><div class="text-xs muted fw-600" style="text-transform:uppercase;">📜 Compliance / Legal</div><ul class="checklist mt-2"><li>Audit log</li><li>Consent tracking</li><li>ML bias audit</li><li>Data residency</li><li>Retention policy</li></ul></div>
+    </div>
+  </div>
+
+  <div class="card mb-6">
+    <div class="card-header"><div><h3 class="card-title">End-to-end flow</h3><div class="card-sub">9 steps · 2 decision gates · cross-role handoffs</div></div><span class="badge badge-info">Reference</span></div>
+    <div style="overflow-x:auto;">
+      <table class="table table-compact" style="min-width:720px;">
+        <thead><tr><th>#</th><th>Step</th><th>Owner</th><th>Role</th><th>Outcome</th></tr></thead>
+        <tbody>
+          <tr><td><span class="badge badge-green">A1</span></td><td>Lead Capture</td><td>Agent App / Spiro</td><td>Swap Agent</td><td>Lead saved to Spiro DB</td></tr>
+          <tr><td><span class="badge badge-green">B2</span></td><td>CX Data Form (23 fields + photo)</td><td>Web / App / Spiro</td><td>Swap Agent</td><td>Form submitted, validated</td></tr>
+          <tr style="background:var(--warning-bg);"><td><span class="badge badge-warning">C3</span></td><td><strong>Identity Verification</strong></td><td>KYC API · NIRA / IPRS</td><td>Agent + Ops</td><td>Pass · Refer (SLA 4h) · Fail</td></tr>
+          <tr style="background:var(--warning-bg);"><td><span class="badge badge-warning">D4</span></td><td><strong>AI Risk Score</strong></td><td>ML model · Spiro</td><td>All</td><td>0–30 Approve · 31–60 Review · 61–100 Decline</td></tr>
+          <tr><td><span class="badge badge-green">D5</span></td><td>Credit Decisioning</td><td>Spiro internal</td><td>Ops Team</td><td>Top 3 risk factors shown</td></tr>
+          <tr><td><span class="badge badge-green">E6</span></td><td>Loan ID Creation</td><td>Webhook → Union (Adara)</td><td>Financier</td><td>Loan ID ≤ 60s</td></tr>
+          <tr><td><span class="badge badge-green">E7</span></td><td>CX Notification</td><td>Spiro Platform</td><td>End Customer</td><td>SMS + in-app</td></tr>
+          <tr><td><span class="badge">F8</span></td><td>Downpayment <span class="muted">(unchanged)</span></td><td>Spiro / PSP</td><td>End Customer</td><td>USSD / app</td></tr>
+          <tr><td><span class="badge">F9</span></td><td>Vehicle Deployment <span class="muted">(unchanged)</span></td><td>Spiro</td><td>Swap Agent</td><td>Vehicle handed over</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="alert alert-info"><div><strong>Prototype scope.</strong> Front-end only — no real API calls. Form validation uses real regex. Source PRD: <em>Asset Financing — PRDs.pdf</em>.</div></div>
+</div>
+</section>
+
+<!-- ============== PORTAL ============== -->
+<section id="section-portal" class="section">
+<div class="portal-layout">
+
+  <!-- Sidebar: roles + sub-roles -->
+  <aside class="portal-sidebar">
+    <div class="portal-user">
+      <div class="portal-avatar" id="role-avatar">JM</div>
+      <div style="flex:1;min-width:0;">
+        <div class="portal-user-name" id="role-name">J. Mukasa</div>
+        <div class="portal-user-role" id="role-label">Swap Agent · Kawempe</div>
+      </div>
+    </div>
+
+    <div class="text-xs muted fw-600" style="text-transform:uppercase;padding:6px 12px;letter-spacing:.05em;">Switch role</div>
+
+    <div class="role-group open" data-role="agent">
+      <div class="role-header active" onclick="toggleRole('agent')"><span class="role-icon">📱</span> Swap Agent <span class="role-chevron">▶</span></div>
+      <div class="role-items">
+        <a class="role-item active" onclick="showView('agent-dashboard',this)">Dashboard</a>
+        <a class="role-item" onclick="showView('agent-lead',this)">New lead</a>
+        <a class="role-item" onclick="showView('agent-cx',this)">CX data form</a>
+        <a class="role-item" onclick="showView('agent-kyc',this)">KYC verification</a>
+        <a class="role-item" onclick="showView('agent-applications',this)">My applications</a>
+        <a class="role-item" onclick="showView('agent-mobile',this)">Mobile preview</a>
+      </div>
+    </div>
+
+    <div class="role-group" data-role="ops">
+      <div class="role-header" onclick="toggleRole('ops')"><span class="role-icon">🛡</span> Spiro Ops <span class="role-chevron">▶</span></div>
+      <div class="role-items">
+        <a class="role-item" onclick="showView('ops-queue',this)">Review queue</a>
+        <a class="role-item" onclick="showView('ops-case',this)">Case detail</a>
+        <a class="role-item" onclick="showView('ops-webhook',this)">Webhook failures</a>
+        <a class="role-item" onclick="showView('ops-geo',this)">Geo-risk heat map</a>
+        <a class="role-item" onclick="showView('ops-model',this)">ML model health</a>
+      </div>
+    </div>
+
+    <div class="role-group" data-role="financier">
+      <div class="role-header" onclick="toggleRole('financier')"><span class="role-icon">⚙</span> Financier Admin <span class="role-chevron">▶</span></div>
+      <div class="role-items">
+        <a class="role-item" onclick="showView('fin-identity',this)">Identity & KYC</a>
+        <a class="role-item" onclick="showView('fin-risk',this)">Risk & decisioning</a>
+        <a class="role-item" onclick="showView('fin-roles',this)">Roles & approvals</a>
+        <a class="role-item" onclick="showView('fin-webhook',this)">Webhook config</a>
+        <a class="role-item" onclick="showView('fin-history',this)">Change history</a>
+      </div>
+    </div>
+
+    <div class="role-group" data-role="compliance">
+      <div class="role-header" onclick="toggleRole('compliance')"><span class="role-icon">📜</span> Compliance / Legal <span class="role-chevron">▶</span></div>
+      <div class="role-items">
+        <a class="role-item" onclick="showView('comp-audit',this)">Audit log</a>
+        <a class="role-item" onclick="showView('comp-consent',this)">Consent tracking</a>
+        <a class="role-item" onclick="showView('comp-bias',this)">ML bias audit</a>
+        <a class="role-item" onclick="showView('comp-residency',this)">Data residency</a>
+        <a class="role-item" onclick="showView('comp-retention',this)">Retention policy</a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main: dynamic views injected here -->
+  <main class="portal-main" id="portal-main"></main>
+
+</div>
+</section>
+
+<!-- ============== RIDER ============== -->
+<section id="section-rider" class="section">
+<div class="container">
+  <div class="page-header">
+    <div class="badge badge-green mb-3">End Customer · Rider</div>
+    <h1 class="page-title">Rider experience — clear, transparent, fast</h1>
+    <p class="page-subtitle">Boda-boda riders never visit a branch. They receive SMS + in-app updates at every decision stage.</p>
+  </div>
+
+  <div class="phone-grid">
+
+    <div class="phone-wrap"><div class="screen-label">SMS · Approved</div>
+    <div class="phone-frame"><div class="phone-screen" style="background:#F2F4F3;">
+      <div class="phone-statusbar"><span>09:30</span><span>● ●●● 88%</span></div>
+      <div class="phone-header" style="background:#fff;"><div style="flex:1"><div class="phone-title">Spiro</div><div class="text-xs muted">SMS · Service messages</div></div></div>
+      <div class="phone-body" style="padding:14px;">
+        <div class="sms-meta text-center">Today · 09:26</div>
+        <div class="sms-bubble"><div class="sms-sender">Spiro</div>Hi Sarah, your Spiro EV application has been received. We'll text you the decision shortly.</div>
+        <div class="sms-meta text-center mt-3">Today · 09:28</div>
+        <div class="sms-bubble"><div class="sms-sender">Spiro</div>Identity verification passed ✓. Reviewing your application now.</div>
+        <div class="sms-meta text-center mt-3">Today · 09:29</div>
+        <div class="sms-bubble" style="background:var(--spiro-green-light);color:var(--text);"><div class="sms-sender">Spiro</div>🎉 Approved! Loan ID: <strong>UN-2026-04812</strong>. Downpayment: UGX 280,000. Pay via *182# or Spiro app.</div>
+      </div>
+    </div></div></div>
+
+    <div class="phone-wrap"><div class="screen-label">In-app · Loan ID</div>
+    <div class="phone-frame"><div class="phone-screen">
+      <div class="phone-statusbar"><span>09:31</span><span>● ●●● 88%</span></div>
+      <div class="phone-header"><div style="flex:1"><div class="phone-title">My application</div><div class="text-xs muted">Sarah Namuli · CM-0482</div></div></div>
+      <div class="phone-body">
+        <div class="card" style="background:var(--spiro-green-light);border:none;padding:18px;text-align:center;margin-bottom:18px;">
+          <div style="font-size:42px;">🎉</div>
+          <h4 style="color:var(--spiro-green-dark);margin-top:8px;">You're approved</h4>
+          <div style="font-family:'Poppins';font-weight:700;font-size:22px;color:var(--spiro-green-dark);margin-top:8px;">UN-2026-04812</div>
+        </div>
+        <div class="card" style="padding:14px;margin-bottom:8px;"><div class="flex justify-between items-center"><div><div class="text-xs muted">Amount due</div><div style="font-family:'Poppins';font-weight:700;font-size:20px;">UGX 280,000</div></div><span class="badge badge-warning">Pending</span></div></div>
+        <ul class="timeline mt-4">
+          <li class="timeline-item"><div class="timeline-dot done">✓</div><div><div class="timeline-title text-xs">Application submitted</div><div class="timeline-meta">09:26</div></div></li>
+          <li class="timeline-item"><div class="timeline-dot done">✓</div><div><div class="timeline-title text-xs">Identity verified</div><div class="timeline-meta">09:28</div></div></li>
+          <li class="timeline-item"><div class="timeline-dot done">✓</div><div><div class="timeline-title text-xs">Approved · Loan ID issued</div><div class="timeline-meta">09:29</div></div></li>
+          <li class="timeline-item"><div class="timeline-dot active">●</div><div><div class="timeline-title text-xs">Awaiting downpayment</div></div></li>
+        </ul>
+      </div>
+      <div class="phone-footer"><button class="btn btn-primary btn-block">Pay UGX 280,000</button></div>
+    </div></div></div>
+
+    <div class="phone-wrap"><div class="screen-label">Under review</div>
+    <div class="phone-frame"><div class="phone-screen">
+      <div class="phone-statusbar"><span>10:05</span><span>● ●●● 84%</span></div>
+      <div class="phone-header"><div style="flex:1"><div class="phone-title">My application</div><div class="text-xs muted">Grace Nakato · CM-0480</div></div></div>
+      <div class="phone-body">
+        <div class="outcome outcome-refer"><div class="outcome-title">⏱ Under review</div><div class="text-xs muted">We need a little more time. You'll hear from us within 4 hours.</div></div>
+        <ul class="timeline mt-4">
+          <li class="timeline-item"><div class="timeline-dot done">✓</div><div><div class="timeline-title text-xs">Submitted</div><div class="timeline-meta">09:38</div></div></li>
+          <li class="timeline-item"><div class="timeline-dot done">✓</div><div><div class="timeline-title text-xs">Initial checks</div><div class="timeline-meta">09:42</div></div></li>
+          <li class="timeline-item"><div class="timeline-dot active">●</div><div><div class="timeline-title text-xs">Manual review</div><div class="timeline-meta">Our team is taking a closer look</div></div></li>
+          <li class="timeline-item"><div class="timeline-dot">·</div><div><div class="timeline-title text-xs">Decision</div><div class="timeline-meta">By 13:42 today</div></div></li>
+        </ul>
+      </div>
+    </div></div></div>
+
+    <div class="phone-wrap"><div class="screen-label">Declined</div>
+    <div class="phone-frame"><div class="phone-screen">
+      <div class="phone-statusbar"><span>14:18</span><span>● ●●● 67%</span></div>
+      <div class="phone-header"><div style="flex:1"><div class="phone-title">My application</div><div class="text-xs muted">Moses Kintu · CM-0479</div></div></div>
+      <div class="phone-body">
+        <div class="outcome outcome-fail"><div class="outcome-title">Application not approved</div><div class="text-xs muted">We're sorry, we can't proceed at this time.</div></div>
+        <div class="card" style="padding:14px;margin-top:16px;"><div class="text-sm">You can re-apply after <strong>14 days</strong>. Call <strong>0800 422 422</strong> if this seems wrong.</div></div>
+        <div class="alert alert-info mt-4"><div class="text-xs"><strong>Your data is safe.</strong> All info encrypted per data protection law.</div></div>
+      </div>
+    </div></div></div>
+
+  </div>
+
+  <div class="card mt-6">
+    <div class="card-header"><h3 class="card-title">Notification matrix</h3><span class="badge badge-info">Module E</span></div>
+    <table class="table">
+      <thead><tr><th>Stage</th><th>Trigger</th><th>Channel</th><th>SLA</th><th>Tone</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge badge-green">Submitted</span></td><td>Form complete</td><td>SMS + in-app</td><td>≤ 60s</td><td>Confirmation</td></tr>
+        <tr><td><span class="badge badge-info">KYC pass</span></td><td>KYC API returns pass</td><td>SMS + in-app</td><td>≤ 60s</td><td>Reassurance</td></tr>
+        <tr><td><span class="badge badge-warning">Under review</span></td><td>KYC refer / human review</td><td>SMS + in-app</td><td>≤ 60s</td><td>Transparent SLA</td></tr>
+        <tr><td><span class="badge badge-success">Approved</span></td><td>Loan ID confirmed</td><td>SMS + in-app</td><td>≤ 2 min</td><td>Celebratory</td></tr>
+        <tr><td><span class="badge badge-danger">Declined</span></td><td>Auto-decline / KYC fail</td><td>SMS + in-app</td><td>≤ 60s</td><td>Respectful, generic</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</section>
+
+<!-- =============== VIEW TEMPLATES =============== -->
+<template id="tpl-views"></template>
+
+<script>
+/* =================== NAVIGATION =================== */
+function showSection(name){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('section-'+name).classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(n=>n.classList.remove('active'));
+  const n = document.querySelector('[data-nav='+name+']'); if(n) n.classList.add('active');
+  window.scrollTo(0,0);
+  if(name==='portal' && !document.getElementById('portal-main').innerHTML.trim()){
+    showView('agent-dashboard', document.querySelector('[data-role=agent] .role-item'));
+  }
+}
+
+const ROLES = {
+  agent:      { name:'J. Mukasa',   role:'Swap Agent · Kawempe',    avatar:'JM' },
+  ops:        { name:'L. Mukasa',   role:'Spiro Ops Manager',        avatar:'LM' },
+  financier:  { name:'M. Wanjiku',  role:'Financier Admin · Union',  avatar:'MW' },
+  compliance: { name:'A. Ouedraogo',role:'Compliance / Legal',       avatar:'AO' }
+};
+
+function toggleRole(role){
+  document.querySelectorAll('.role-group').forEach(g=>{
+    if(g.dataset.role===role){ g.classList.toggle('open'); }
+    else { g.classList.remove('open'); }
+  });
+  // Switch user profile to role's lead
+  const meta = ROLES[role]; if(meta){
+    document.getElementById('role-name').textContent  = meta.name;
+    document.getElementById('role-label').textContent = meta.role;
+    document.getElementById('role-avatar').textContent= meta.avatar;
+  }
+  document.querySelectorAll('.role-header').forEach(h=>h.classList.remove('active'));
+  const grp = document.querySelector('[data-role='+role+']');
+  if(grp){ grp.querySelector('.role-header').classList.add('active'); }
+}
+
+function showView(id, el){
+  const v = VIEWS[id]; if(!v) return;
+  document.getElementById('portal-main').innerHTML = v();
+  document.querySelectorAll('.role-item').forEach(i=>i.classList.remove('active'));
+  if(el) el.classList.add('active');
+  // run any view-init hook
+  if(typeof VIEW_INIT[id]==='function') VIEW_INIT[id]();
+}
+
+/* =================== VALIDATORS (regex) =================== */
+const RX = {
+  name:    /^[A-Za-z][A-Za-z'\- ]{1,49}$/,                 // letters, space, hyphen, apostrophe, 2–50 chars
+  phoneUG: /^\+?256[\s-]?7\d{2}[\s-]?\d{3}[\s-]?\d{3}$/,   // +256 7XX XXX XXX
+  phoneAny:/^\+?(256|254|250)[\s-]?\d{9}$/,                // UG/KE/RW E.164-ish
+  nin:     /^[A-Z]{2}[0-9A-Z]{12}$/,                        // 14 alphanumeric, starts 2 letters
+  dob:     /^(0[1-9]|[12]\d|3[01])\s*\/\s*(0[1-9]|1[0-2])\s*\/\s*(19|20)\d{2}$/,
+  income:  /^[0-9,]{4,}$/,                                  // numbers + commas, min 4 chars (≥1,000)
+  permit:  /^[A-Z]{2}\d{6,10}$/                             // Uganda driving permit-ish
+};
+
+function setMsg(input, msgEl, ok, msg){
+  input.classList.remove('valid','invalid');
+  msgEl.classList.remove('ok','err');
+  if(input.value===''){ msgEl.textContent=''; return; }
+  if(ok){ input.classList.add('valid'); msgEl.classList.add('ok'); msgEl.textContent='✓ '+msg; }
+  else  { input.classList.add('invalid'); msgEl.classList.add('err'); msgEl.textContent='✕ '+msg; }
+}
+
+function validateField(input){
+  const v = input.value.trim();
+  const msg = input.parentElement.querySelector('.field-msg');
+  if(!msg) return true;
+  switch(input.dataset.validate){
+    case 'name':    setMsg(input,msg, RX.name.test(v),    RX.name.test(v) ? 'Looks good' : 'Use letters, 2–50 chars'); break;
+    case 'phone':   setMsg(input,msg, RX.phoneUG.test(v), RX.phoneUG.test(v) ? 'Valid UG number' : 'Use +256 7XX XXX XXX'); break;
+    case 'phoneAny':setMsg(input,msg, RX.phoneAny.test(v),RX.phoneAny.test(v)? 'Valid number' : 'Use +256/+254/+250 + 9 digits'); break;
+    case 'nin':     setMsg(input,msg, RX.nin.test(v),     RX.nin.test(v)     ? 'Valid NIN format' : '14 characters · 2 letters + 12 alphanumeric'); break;
+    case 'dob':     setMsg(input,msg, RX.dob.test(v),     RX.dob.test(v)     ? 'Date OK' : 'Use DD / MM / YYYY'); break;
+    case 'income':  setMsg(input,msg, RX.income.test(v) && parseInt(v.replace(/,/g,''))>=100000, parseInt(v.replace(/,/g,''))>=100000 ? 'Within expected range' : 'Min UGX 100,000'); break;
+    case 'permit':  setMsg(input,msg, RX.permit.test(v),  RX.permit.test(v)  ? 'Valid permit format' : 'e.g. UG123456'); break;
+    case 'required':setMsg(input,msg, v.length>0,         v.length>0 ? 'Set' : 'Required'); break;
+  }
+  return msg.classList.contains('ok');
+}
+
+function attachValidation(scopeId){
+  const scope = document.getElementById(scopeId); if(!scope) return;
+  scope.querySelectorAll('[data-validate]').forEach(inp=>{
+    inp.addEventListener('input', ()=>validateField(inp));
+    inp.addEventListener('blur',  ()=>validateField(inp));
+    if(inp.value) validateField(inp);
+  });
+  const form = scope.querySelector('[data-form]');
+  if(form){
+    const submit = scope.querySelector('[data-submit]');
+    function refreshButton(){
+      const inputs = scope.querySelectorAll('[data-validate]');
+      let allOk = true;
+      inputs.forEach(i=>{ if(!validateField(i)) allOk=false; });
+      submit.disabled = !allOk;
+    }
+    form.addEventListener('input', refreshButton);
+    setTimeout(refreshButton, 50);
+  }
+}
+
+const VIEW_INIT = {};
+const VIEWS = {};
+</script>
+
+<!-- VIEW DEFINITIONS injected below -->
+<script id="views-script">
+/* ================ AGENT VIEWS ================ */
+VIEWS['agent-dashboard'] = ()=>`
+  <div class="view-header">
+    <div><div class="crumb">Swap Agent</div><h2 class="view-title">Dashboard</h2><div class="view-sub">Kampala · Union branch 04 · Today 09:24</div></div>
+    <button class="btn btn-primary" onclick="document.querySelectorAll('.role-item')[1].click()">+ New lead</button>
+  </div>
+
+  <div class="grid grid-4 mb-6">
+    <div class="kpi"><div class="kpi-label">Leads today</div><div class="kpi-value">7</div><div class="kpi-delta up">+2 vs yesterday</div></div>
+    <div class="kpi"><div class="kpi-label">Approved</div><div class="kpi-value" style="color:var(--success);">5</div><div class="kpi-delta">71% conversion</div></div>
+    <div class="kpi"><div class="kpi-label">Under review</div><div class="kpi-value" style="color:var(--warning);">1</div><div class="kpi-delta">SLA in 2h 14m</div></div>
+    <div class="kpi"><div class="kpi-label">Avg. submission</div><div class="kpi-value">28s</div><div class="kpi-delta up">Target ≤30s</div></div>
+  </div>
+
+  <div class="card mb-6">
+    <div class="card-header"><h4>Recent applications</h4><a class="text-xs" onclick="showView('agent-applications',document.querySelectorAll('.role-item')[4])">View all →</a></div>
+    <table class="table">
+      <thead><tr><th>Case ID</th><th>Customer</th><th>Submitted</th><th>Stage</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td><span class="case-id">CM-0482</span></td><td>Sarah Namuli</td><td>09:28</td><td>Loan ID issued</td><td><span class="badge badge-success">Approved</span></td></tr>
+        <tr><td><span class="case-id">CM-0481</span></td><td>Patrick Okello</td><td>09:12</td><td>Loan ID issued</td><td><span class="badge badge-success">Approved</span></td></tr>
+        <tr><td><span class="case-id">CM-0480</span></td><td>Grace Nakato</td><td>08:50</td><td>Ops review</td><td><span class="badge badge-warning">Under review</span></td></tr>
+        <tr><td><span class="case-id">CM-0479</span></td><td>Moses Kintu</td><td>08:18</td><td>Auto-decline</td><td><span class="badge badge-danger">Declined</span></td></tr>
+        <tr><td><span class="case-id">CM-0478</span></td><td>Brian Ssempa</td><td>07:52</td><td>Webhook retry</td><td><span class="badge badge-warning">Stalled</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="alert alert-info"><div><strong>Offline mode reminder:</strong> If you lose signal, the app keeps saving locally. Submissions sync the moment you reconnect.</div></div>
+`;
+
+VIEWS['agent-lead'] = ()=>`
+  <div class="view-header">
+    <div><div class="crumb">Swap Agent · Step A1</div><h2 class="view-title">New lead</h2><div class="view-sub">Basic info before the full CX form · all fields validated in real time</div></div>
+    <span class="badge badge-info">Auto-saved every 30s</span>
+  </div>
+
+  <div class="card" id="leadForm">
+    <form data-form>
+      <div class="steps"><div class="step-dot active"></div><div class="step-dot"></div><div class="step-dot"></div><div class="step-dot"></div><div class="step-dot"></div></div>
+      <div class="step-label">Step 1 of 5 · Basic info</div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label class="field-label">Full name <span class="req">*</span></label>
+          <input class="input" data-validate="name" placeholder="e.g. Sarah Namuli" value="Sarah Namuli">
+          <div class="field-msg"></div>
+          <div class="field-hint">Letters, spaces, hyphens · 2–50 chars · regex <code>/^[A-Za-z][A-Za-z'\\- ]{1,49}$/</code></div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Phone number <span class="req">*</span></label>
+          <input class="input" data-validate="phone" placeholder="+256 7XX XXX XXX" value="+256 772 481 902">
+          <div class="field-msg"></div>
+          <div class="field-hint">Ugandan mobile · regex <code>/^\\+?256[\\s-]?7\\d{2}[\\s-]?\\d{3}[\\s-]?\\d{3}$/</code></div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Location <span class="req">*</span></label>
+          <select class="select" data-validate="required">
+            <option value="">— Select division —</option>
+            <option value="kawempe" selected>Kawempe Division, Kampala</option>
+            <option value="nakawa">Nakawa Division, Kampala</option>
+            <option value="central">Central Division, Kampala</option>
+            <option value="lubaga">Lubaga Division, Kampala</option>
+            <option value="makindye">Makindye Division, Kampala</option>
+          </select>
+          <div class="field-msg"></div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Source <span class="req">*</span></label>
+          <select class="select" data-validate="required">
+            <option value="">— Select source —</option>
+            <option value="union" selected>Union referral</option>
+            <option value="walkin">Walk-in</option>
+            <option value="rider">Existing rider referral</option>
+            <option value="event">Community event</option>
+          </select>
+          <div class="field-msg"></div>
+        </div>
+      </div>
+
+      <div class="alert alert-success mt-3"><div class="text-xs"><strong>Auto-saved.</strong> Lead draft persists even if you go offline.</div></div>
+
+      <div class="flex justify-between items-center mt-4">
+        <span class="text-xs muted">Validation runs locally first; API checks on submit.</span>
+        <button class="btn btn-primary btn-lg" data-submit onclick="event.preventDefault(); showView('agent-cx', document.querySelectorAll('.role-item')[2]);">Continue to CX form →</button>
+      </div>
+    </form>
+  </div>
+`;
+VIEW_INIT['agent-lead'] = ()=>attachValidation('leadForm');
+
+VIEWS['agent-cx'] = ()=>`
+  <div class="view-header">
+    <div><div class="crumb">Swap Agent · Step B2</div><h2 class="view-title">CX data form</h2><div class="view-sub">23-field digital form · real-time validation · in-app photo with liveness check</div></div>
+    <span class="badge badge-info">Step 2 of 5</span>
+  </div>
+
+  <div class="card" id="cxForm">
+    <form data-form>
+      <div class="steps"><div class="step-dot done"></div><div class="step-dot active"></div><div class="step-dot"></div><div class="step-dot"></div><div class="step-dot"></div></div>
+      <div class="step-label">Identity & income · 5 of 23 fields shown · all mandatory</div>
+
+      <div class="form-grid">
+        <div class="field">
+          <label class="field-label">National ID (NIN) <span class="req">*</span></label>
+          <input class="input" data-validate="nin" placeholder="CMxxxxxxxxxxxx" value="CM85101410ABCD" style="text-transform:uppercase">
+          <div class="field-msg"></div>
+          <div class="field-hint">14 alphanumeric · 2 letters + 12 alphanumeric · regex <code>/^[A-Z]{2}[0-9A-Z]{12}$/</code></div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Date of birth <span class="req">*</span></label>
+          <input class="input" data-validate="dob" placeholder="DD / MM / YYYY" value="14 / 03 / 1992">
+          <div class="field-msg"></div>
+          <div class="field-hint">DD / MM / YYYY · 1900–2099</div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Monthly income (UGX) <span class="req">*</span></label>
+          <input class="input" data-validate="income" placeholder="e.g. 850,000" value="850,000">
+          <div class="field-msg"></div>
+          <div class="field-hint">Numeric, commas allowed · min UGX 100,000</div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Driving permit number <span class="req">*</span></label>
+          <input class="input" data-validate="permit" placeholder="e.g. UG123456" value="UG842617">
+          <div class="field-msg"></div>
+          <div class="field-hint">2 letters + 6–10 digits</div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Guarantor NIN <span class="req">*</span></label>
+          <input class="input" data-validate="nin" placeholder="CMxxxxxxxxxxxx" value="CM78062302WXYZ" style="text-transform:uppercase">
+          <div class="field-msg"></div>
+        </div>
+
+        <div class="field">
+          <label class="field-label">Guarantor phone <span class="req">*</span></label>
+          <input class="input" data-validate="phoneAny" placeholder="+256 / +254 / +250 + 9 digits" value="+256 701 332 411">
+          <div class="field-msg"></div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="card" style="background:var(--bg);border:none;padding:14px;">
+        <div class="flex justify-between items-center">
+          <div>
+            <div class="text-sm fw-600">📷 In-app photo + liveness check</div>
+            <div class="text-xs muted">Captured in-session · liveness score must clear threshold (default 0.75)</div>
+          </div>
+          <span class="badge badge-success">Captured · score 0.92</span>
+        </div>
+      </div>
+
+      <div class="alert alert-warning mt-3"><div class="text-xs"><strong>Mandatory fields:</strong> submission is blocked until every required field passes validation. Financier can suppress non-mandatory fields via admin panel.</div></div>
+
+      <div class="flex justify-between items-center mt-4">
+        <span class="text-xs muted">Form auto-saves every 30 seconds.</span>
+        <div class="flex gap-2">
+          <button class="btn btn-secondary" onclick="event.preventDefault(); showView('agent-lead',document.querySelectorAll('.role-item')[1])">← Back</button>
+          <button class="btn btn-primary" data-submit onclick="event.preventDefault(); showView('agent-kyc',document.querySelectorAll('.role-item')[3]);">Submit & run KYC →</button>
+        </div>
+      </div>
+    </form>
+  </div>
+`;
+VIEW_INIT['agent-cx'] = ()=>attachValidation('cxForm');
+
+VIEWS['agent-kyc'] = ()=>`
+  <div class="view-header">
+    <div><div class="crumb">Swap Agent · Step C3</div><h2 class="view-title">KYC verification</h2><div class="view-sub">Real-time checks against NIRA, biometric matcher, and duplicate scan · p95 ≤ 5s</div></div>
+    <span class="badge badge-success">Live</span>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" onclick="kycTab('pass',this)">Pass (Approve)</div>
+    <div class="tab" onclick="kycTab('refer',this)">Refer (Ops queue)</div>
+    <div class="tab" onclick="kycTab('fail',this)">Fail (Decline)</div>
+    <div class="tab" onclick="kycTab('down',this)">API unavailable</div>
+  </div>
+
+  <div id="kyc-pass">
+    <div class="outcome outcome-pass"><div class="outcome-title">✓ KYC passed · Auto-approved</div><div class="text-xs muted">All 4 identity checks cleared · Risk score 22/100</div></div>
+    <div class="grid grid-2 gap-4">
+      <div class="card">
+        <h4 class="mb-3">Verification checks</h4>
+        <ul class="timeline">
+          <li class="timeline-item"><div class="timeline-dot done">✓</div><div><div class="timeline-title">NIN verified · NIRA</div><div class="timeline-meta">Match found · 1.2s</div></div></li>
+          <li class="timeline-item"><div class="timeline-dot done">✓</div><div><div class="timeline-title">Biometric match</div><div class="timeline-meta">Score 0.91 · threshold 0.75</div></div></li>
+          <li class="timeline-item"><div class="timeline-dot done">✓</div><div><div class="timeline-title">Driving permit valid</div><div class="timeline-meta">Expires 2029-03</div></div></li>
+          <li class="timeline-item"><div class="timeline-dot done">✓</div><div><div class="timeline-title">Duplicate check</div><div class="timeline-meta">No conflicts in Spiro DB</div></div></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h4 class="mb-3">AI risk score</h4>
+        <div style="font-family:'Poppins';font-size:42px;font-weight:600;color:var(--success);line-height:1;">22<span style="font-size:18px;color:var(--text-muted);"> / 100</span></div>
+        <div class="risk-bar"><div class="risk-pointer" style="left:22%;"></div></div>
+        <div class="risk-legend"><span>0 Approve</span><span>30</span><span>60</span><span>100</span></div>
+        <div class="divider"></div>
+        <div class="text-xs muted fw-600 mb-2" style="text-transform:uppercase;">Loan ID</div>
+        <div style="font-family:'Poppins';font-weight:700;font-size:22px;color:var(--spiro-green-dark);">UN-2026-04812</div>
+        <div class="text-xs muted">Issued by Union Adara · 09:29</div>
+        <div class="alert alert-success mt-3"><div class="text-xs">SMS + in-app notification sent to <strong>+256 772 481 902</strong></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="kyc-refer" style="display:none">
+    <div class="outcome outcome-refer"><div class="outcome-title">⏱ KYC Refer · queued to Ops</div><div class="text-xs muted">Manual review · SLA 4 hours · agent and customer see "Under review"</div></div>
+    <div class="card"><h4 class="mb-3">Reasons for refer</h4>
+      <ul class="timeline">
+        <li class="timeline-item"><div class="timeline-dot done">✓</div><div><div class="timeline-title">NIN format valid</div><div class="timeline-meta">Cross-check returned partial match — NIRA flagged middle name mismatch</div></div></li>
+        <li class="timeline-item"><div class="timeline-dot done">✓</div><div><div class="timeline-title">Biometric captured</div><div class="timeline-meta">Score 0.71 · just below 0.75 threshold</div></div></li>
+        <li class="timeline-item"><div class="timeline-dot active">!</div><div><div class="timeline-title">Queued for human review</div><div class="timeline-meta">Spiro CX Support · est. 1–4 hrs</div></div></li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="kyc-fail" style="display:none">
+    <div class="outcome outcome-fail"><div class="outcome-title">✕ Cannot proceed · Application blocked</div><div class="text-xs muted">Customer notified with generic reason · re-apply allowed after 14 days</div></div>
+    <div class="card"><h4 class="mb-3">Reason category</h4>
+      <div class="alert alert-danger"><div><strong>Duplicate application detected.</strong> An active application with this NIN already exists in Spiro DB. Specific reasons are not shared with the agent or customer to protect data integrity.</div></div>
+      <div class="text-xs muted fw-600 mb-2" style="text-transform:uppercase;">What to tell the customer</div>
+      <ul class="checklist">
+        <li><span class="check-dot ok">✓</span> Application cannot be submitted today</li>
+        <li><span class="check-dot ok">✓</span> Re-application allowed in 14 days</li>
+        <li><span class="check-dot ok">✓</span> Customer can call CX Support · 0800 422 422</li>
+      </ul>
+    </div>
+  </div>
+
+  <div id="kyc-down" style="display:none">
+    <div class="outcome outcome-refer"><div class="outcome-title">⚠ KYC API temporarily unavailable</div><div class="text-xs muted">Graceful degradation · submission queued · agent can move on</div></div>
+    <div class="card">
+      <ul class="timeline">
+        <li class="timeline-item"><div class="timeline-dot done">✓</div><div><div class="timeline-title">Form saved to Spiro DB</div><div class="timeline-meta">CM-0485 · 11:01</div></div></li>
+        <li class="timeline-item"><div class="timeline-dot active">⏱</div><div><div class="timeline-title">KYC verification queued</div><div class="timeline-meta">Will retry every 5 min · Ops notified</div></div></li>
+        <li class="timeline-item"><div class="timeline-dot">·</div><div><div class="timeline-title">Decision pending</div><div class="timeline-meta">Customer notified once complete</div></div></li>
+      </ul>
+    </div>
+  </div>
+`;
+VIEW_INIT['agent-kyc'] = ()=>{
+  window.kycTab = function(name, el){
+    ['pass','refer','fail','down'].forEach(n=>document.getElementById('kyc-'+n).style.display='none');
+    document.getElementById('kyc-'+name).style.display='block';
+    el.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    el.classList.add('active');
+  };
+};
+
+VIEWS['agent-applications'] = ()=>`
+  <div class="view-header">
+    <div><div class="crumb">Swap Agent</div><h2 class="view-title">My applications</h2><div class="view-sub">All leads you've submitted · live status from Spiro DB</div></div>
+    <div class="flex gap-2"><select class="select" style="font-size:12px;padding:6px 10px;"><option>All statuses</option><option>Approved</option><option>Under review</option><option>Declined</option></select></div>
+  </div>
+
+  <div class="card" style="padding:0;">
+    <table class="table">
+      <thead><tr><th>Case ID</th><th>Customer</th><th>Phone</th><th>Submitted</th><th>Risk score</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td><span class="case-id">CM-0482</span></td><td>Sarah Namuli</td><td>+256 772 481 902</td><td>Today · 09:28</td><td>22</td><td><span class="badge badge-success">Approved</span></td></tr>
+        <tr><td><span class="case-id">CM-0481</span></td><td>Patrick Okello</td><td>+256 752 118 044</td><td>Today · 09:12</td><td>18</td><td><span class="badge badge-success">Approved</span></td></tr>
+        <tr><td><span class="case-id">CM-0480</span></td><td>Grace Nakato</td><td>+256 778 660 215</td><td>Today · 08:50</td><td>—</td><td><span class="badge badge-warning">Under review</span></td></tr>
+        <tr><td><span class="case-id">CM-0479</span></td><td>Moses Kintu</td><td>+256 751 902 887</td><td>Today · 08:18</td><td>74</td><td><span class="badge badge-danger">Declined</span></td></tr>
+        <tr><td><span class="case-id">CM-0478</span></td><td>Brian Ssempa</td><td>+256 772 411 098</td><td>Today · 07:52</td><td>28</td><td><span class="badge badge-warning">Webhook stalled</span></td></tr>
+        <tr><td><span class="case-id">CM-0476</span></td><td>Annet Asiimwe</td><td>+256 779 332 110</td><td>Yest · 17:04</td><td>34</td><td><span class="badge badge-success">Approved</span></td></tr>
+        <tr><td><span class="case-id">CM-0473</span></td><td>Peter Lubega</td><td>+256 753 088 222</td><td>Yest · 14:18</td><td>—</td><td><span class="badge badge-info">KYC Refer</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+`;
+
+/* ================ OPS VIEWS ================ */
+VIEWS['ops-queue'] = ()=>`
+  <div class="view-header">
+    <div><div class="crumb">Spiro Ops</div><h2 class="view-title">Review queue</h2><div class="view-sub">21 cases pending · SLA: 4h Refer · 6h Review</div></div>
+    <div class="flex gap-2"><button class="btn btn-secondary btn-sm">Export CSV</button><button class="btn btn-primary btn-sm">+ Bulk action</button></div>
+  </div>
+
+  <div class="grid grid-4 mb-6">
+    <div class="kpi"><div class="kpi-label">In queue</div><div class="kpi-value">21</div><div class="kpi-delta down">↓ 4 vs yesterday</div></div>
+    <div class="kpi"><div class="kpi-label">Avg. resolution</div><div class="kpi-value">2h 14m</div><div class="kpi-delta up">Within SLA</div></div>
+    <div class="kpi"><div class="kpi-label">Auto-approval</div><div class="kpi-value">68%</div><div class="kpi-delta up">+3% WoW</div></div>
+    <div class="kpi"><div class="kpi-label">KYC pass · 1st</div><div class="kpi-value">83%</div><div class="kpi-delta up">Target ≥80%</div></div>
+  </div>
+
+  <div class="flex gap-2 mb-4 items-center">
+    <span class="text-xs muted fw-600" style="text-transform:uppercase;">Filter:</span>
+    <span class="badge badge-green">All · 21</span>
+    <span class="badge">KYC Refer · 7</span>
+    <span class="badge">Score 31–60 · 12</span>
+    <span class="badge">Geo-flag · 4</span>
+    <span class="badge">Guarantor risk · 3</span>
+  </div>
+
+  <div class="card" style="padding:0;">
+    <table class="table">
+      <thead><tr><th>Case ID</th><th>Customer</th><th>Type</th><th>Score</th><th>SLA left</th><th>Action</th></tr></thead>
+      <tbody>
+        <tr class="case-row"><td><span class="case-id">CM-0482</span></td><td>Sarah Namuli</td><td><span class="badge badge-warning">Review</span></td><td>48</td><td><span style="color:var(--danger);font-weight:600;">22 min</span></td><td><a onclick="showView('ops-case',document.querySelectorAll('.role-item')[1])">Open →</a></td></tr>
+        <tr class="case-row"><td><span class="case-id">CM-0480</span></td><td>Grace Nakato</td><td><span class="badge badge-info">KYC Refer</span></td><td>—</td><td>1h 12m</td><td><a>Open →</a></td></tr>
+        <tr class="case-row"><td><span class="case-id">CM-0477</span></td><td>Brian Ssempa</td><td><span class="badge badge-warning">Review</span></td><td>52</td><td>1h 48m</td><td><a>Open →</a></td></tr>
+        <tr class="case-row"><td><span class="case-id">CM-0474</span></td><td>Annet Asiimwe</td><td><span class="badge badge-warning">Review</span></td><td>41</td><td>2h 30m</td><td><a>Open →</a></td></tr>
+        <tr class="case-row"><td><span class="case-id">CM-0473</span></td><td>Peter Lubega</td><td><span class="badge badge-info">KYC Refer</span></td><td>—</td><td>2h 51m</td><td><a>Open →</a></td></tr>
+        <tr class="case-row"><td><span class="case-id">CM-0471</span></td><td>Esther Kalibala</td><td><span class="badge badge-warning">Review</span></td><td>57</td><td>3h 04m</td><td><a>Open →</a></td></tr>
+        <tr class="case-row"><td><span class="case-id">CM-0469</span></td><td>Daniel Mwesigwa</td><td><span class="badge badge-warning">Review</span></td><td>38</td><td>3h 22m</td><td><a>Open →</a></td></tr>
+        <tr class="case-row"><td><span class="case-id">CM-0466</span></td><td>Joyce Mbabazi</td><td><span class="badge badge-info">KYC Refer</span></td><td>—</td><td>3h 41m</td><td><a>Open →</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+`;
+
+VIEWS['ops-case'] = ()=>`
+  <div class="view-header">
+    <div><div class="crumb">Spiro Ops · Review queue</div><h2 class="view-title">CM-0482 · Sarah Namuli</h2><div class="view-sub">Submitted 09:28 · Agent J. Mukasa · Kawempe · SLA in 22 min</div></div>
+    <span class="badge badge-warning">Review · SLA 22m</span>
+  </div>
+
+  <div class="grid grid-2 gap-4">
+    <div class="card">
+      <h4 class="mb-3">AI risk score</h4>
+      <div class="flex items-center gap-3">
+        <div style="font-family:'Poppins';font-size:42px;font-weight:600;color:var(--warning);line-height:1;">48<span style="font-size:14px;color:var(--text-muted);"> / 100</span></div>
+        <div style="flex:1;"><div class="risk-bar"><div class="risk-pointer" style="left:48%;"></div></div><div class="risk-legend"><span>Approve</span><span>Review</span><span>Decline</span></div></div>
+      </div>
+      <div class="divider"></div>
+      <div class="text-xs muted fw-600 mb-2" style="text-transform:uppercase;">KYC verification</div>
+      <table class="table table-compact" style="margin-bottom:0;">
+        <tbody>
+          <tr><td class="text-xs muted" style="border:none;padding:4px 0;">NIN · NIRA</td><td style="border:none;padding:4px 0;text-align:right;"><span class="badge badge-success">Pass</span></td></tr>
+          <tr><td class="text-xs muted" style="border:none;padding:4px 0;">Biometric</td><td style="border:none;padding:4px 0;text-align:right;">0.82 · <span class="badge badge-success">Pass</span></td></tr>
+          <tr><td class="text-xs muted" style="border:none;padding:4px 0;">Driving permit</td><td style="border:none;padding:4px 0;text-align:right;"><span class="badge badge-success">Valid</span></td></tr>
+          <tr><td class="text-xs muted" style="border:none;padding:4px 0;">Duplicate</td><td style="border:none;padding:4px 0;text-align:right;"><span class="badge badge-success">None</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h4 class="mb-3">Top 3 risk factors</h4>
+      <div class="factor-card negative mb-2"><div class="flex justify-between items-center"><div class="text-sm fw-600">Geo-risk · Kawempe</div><div class="text-xs muted">Weight 0.32</div></div><div class="text-xs muted mt-1">Sub-county 60-day default rate 18% (vs. 11% platform avg)</div><div class="factor-weight"><div class="factor-weight-fill" style="width:64%;background:var(--danger);"></div></div></div>
+      <div class="factor-card neutral mb-2"><div class="flex justify-between items-center"><div class="text-sm fw-600">Income / asset ratio</div><div class="text-xs muted">Weight 0.22</div></div><div class="text-xs muted mt-1">EMI coverage 1.6× (preferred 2.0×)</div><div class="factor-weight"><div class="factor-weight-fill" style="width:44%;background:var(--warning);"></div></div></div>
+      <div class="factor-card positive"><div class="flex justify-between items-center"><div class="text-sm fw-600">Guarantor profile</div><div class="text-xs muted">Weight 0.20</div></div><div class="text-xs muted mt-1">Union member · 0 defaults across 4 prior loans</div><div class="factor-weight"><div class="factor-weight-fill" style="width:40%;background:var(--success);"></div></div></div>
+    </div>
+  </div>
+
+  <div class="card mt-4">
+    <h4 class="mb-3">Decision</h4>
+    <div class="field"><label class="field-label">Reviewer notes</label><textarea class="textarea" rows="2" placeholder="Optional · visible in audit trail"></textarea></div>
+    <div class="flex gap-2 mt-3"><button class="btn btn-primary" style="flex:1;">Approve</button><button class="btn btn-secondary" style="flex:1;">Request more info</button><button class="btn btn-danger" style="flex:1;">Decline</button></div>
+    <div class="text-xs muted mt-2 text-center">Auto-decline override requires Ops Manager approval</div>
+  </div>
+`;
+
+VIEWS['ops-webhook'] = ()=>`
+  <div class="view-header">
+    <div><div class="crumb">Spiro Ops</div><h2 class="view-title">Webhook failures · Spiro → Union (Adara)</h2><div class="view-sub">Loan ID creation stalled · manual fallback SLA 1 hr</div></div>
+    <span class="badge badge-danger">2 active</span>
+  </div>
+
+  <div class="card mb-4">
+    <table class="table">
+      <thead><tr><th>Case</th><th>Last retry</th><th>Attempt</th><th>Error</th><th>Action</th></tr></thead>
+      <tbody>
+        <tr><td><span class="case-id">CM-0478</span></td><td>2 min ago</td><td>3 / 3</td><td><span class="badge badge-danger">503 · Adara timeout</span></td><td><button class="btn btn-secondary btn-sm">Manual push</button></td></tr>
+        <tr><td><span class="case-id">CM-0475</span></td><td>11 min ago</td><td>3 / 3</td><td><span class="badge badge-danger">503 · Adara timeout</span></td><td><button class="btn btn-secondary btn-sm">Manual push</button></td></tr>
+      </tbody>
+    </table>
+    <div class="alert alert-warning mt-3"><div class="text-xs"><strong>Manual fallback SLA: 1 hr.</strong> Ops alerted within 5 min of 3rd retry failure (per PRD).</div></div>
+  </div>
+
+  <div class="card">
+    <h4 class="mb-3">7-day delivery health</h4>
+    <div class="grid grid-3 gap-4">
+      <div class="kpi" style="padding:14px;"><div class="kpi-label" style="font-size:10px;">Delivery success</div><div class="kpi-value" style="font-size:22px;">99.4%</div></div>
+      <div class="kpi" style="padding:14px;"><div class="kpi-label" style="font-size:10px;">Avg. latency</div><div class="kpi-value" style="font-size:22px;">2.1s</div></div>
+      <div class="kpi" style="padding:14px;"><div class="kpi-label" style="font-size:10px;">Failed (7d)</div><div class="kpi-value" style="font-size:22px;color:var(--warning);">11</div></div>
+    </div>
+  </div>
+`;
+
+VIEWS['ops-geo'] = ()=>`
+  <div class="view-header">
+    <div><div class="crumb">Spiro Ops</div><h2 class="view-title">Geo-risk heat map · Kampala</h2><div class="view-sub">60-day default rate by sub-county · updated daily · fed into ML risk score</div></div>
+    <span class="badge badge-info">Updated 11:00 today</span>
+  </div>
+
+  <div class="card">
+    <div class="grid" style="grid-template-columns:repeat(6,1fr);gap:8px;max-width:560px;margin-bottom:14px;">
+      <div class="heat-cell" style="background:#10B981;">Nakawa<br>6%</div>
+      <div class="heat-cell" style="background:#34D399;">Central<br>8%</div>
+      <div class="heat-cell" style="background:#A7F3D0;color:#065F46;">Lubaga<br>9%</div>
+      <div class="heat-cell" style="background:#FCD34D;color:#78350F;">Makindye<br>12%</div>
+      <div class="heat-cell" style="background:#F59E0B;">Kawempe<br>18%</div>
+      <div class="heat-cell" style="background:#EF4444;">Kisenyi<br>23%</div>
+      <div class="heat-cell" style="background:#34D399;">Wakiso<br>7%</div>
+      <div class="heat-cell" style="background:#A7F3D0;color:#065F46;">Kira<br>10%</div>
+      <div class="heat-cell" style="background:#FCD34D;color:#78350F;">Mukono<br>13%</div>
+      <div class="heat-cell" style="background:#F59E0B;">Entebbe<br>16%</div>
+      <div class="heat-cell" style="background:#FCD34D;color:#78350F;">Nansana<br>14%</div>
+      <div class="heat-cell" style="background:#A7F3D0;color:#065F46;">Mpigi<br>9%</div>
+    </div>
+    <div class="text-xs muted flex justify-between" style="max-width:560px;"><span>Lower default %</span><span>Higher default %</span></div>
+    <div style="height:8px;border-radius:4px;margin-top:6px;background:linear-gradient(to right,#10B981,#FCD34D,#EF4444);max-width:560px;"></div>
+    <div class="alert alert-info mt-4"><div class="text-xs">Geo signal is <strong>financier-configurable</strong> · contributes ~30% of risk score weight when enabled.</div></div>
+  </div>
+`;
+
+VIEWS['ops-model'] = ()=>`
+  <div class="view-header">
+    <div><div class="crumb">Spiro Ops</div><h2 class="view-title">ML model health · v1.4</h2><div class="view-sub">Bias audit · performance · fallback state · retraining schedule</div></div>
+    <span class="badge badge-success">Live</span>
+  </div>
+
+  <div class="grid grid-4 mb-4">
+    <div class="kpi"><div class="kpi-label">Accuracy vs. human</div><div class="kpi-value" style="color:var(--success);">87.2%</div><div class="kpi-delta">Target ≥ 85%</div></div>
+    <div class="kpi"><div class="kpi-label">Auto-approval</div><div class="kpi-value">68%</div><div class="kpi-delta">Decline 14% · Review 18%</div></div>
+    <div class="kpi"><div class="kpi-label">Last retrain</div><div class="kpi-value">12d ago</div><div class="kpi-delta">Monthly cadence</div></div>
+    <div class="kpi"><div class="kpi-label">Last bias audit</div><div class="kpi-value">Apr 18</div><div class="kpi-delta up">Passed</div></div>
+  </div>
+
+  <div class="card">
+    <h4 class="mb-3">Fallback behaviour</h4>
+    <div class="alert alert-warning"><div class="text-xs"><strong>If model is unavailable:</strong> all applications route to human review queue · zero auto-approvals or auto-declines · Ops alerted immediately. Non-configurable per PRD § D.</div></div>
+    <div class="text-xs muted fw-600 mb-2 mt-3" style="text-transform:uppercase;">Retraining pipeline</div>
+    <ul class="checklist">
+      <li><span class="check-dot ok">✓</span> Monthly automated retrain on new application + repayment data</li>
+      <li><span class="check-dot ok">✓</span> V1 psychographic signals included as input features</li>
+      <li><span class="check-dot ok">✓</span> Hold-out test set per region + gender for bias monitoring</li>
+      <li><span class="check-dot ok">✓</span> Performance dashboard updated post-run</li>
+    </ul>
+  </div>
+`;
+
+/* ================ FINANCIER VIEWS ================ */
+VIEWS['fin-identity'] = ()=>`
+  <div class="view-header">
+    <div><div class="crumb">Financier Admin · Union MFI Uganda</div><h2 class="view-title">Identity & KYC configuration</h2><div class="view-sub">Tune verification rules without code deployment · all changes versioned & audit-logged</div></div>
+    <div class="flex gap-2"><button class="btn btn-secondary btn-sm">Discard</button><button class="btn btn-primary btn-sm">Save changes</button></div>
+  </div>
+
+  <div class="alert alert-warning"><div class="text-sm"><strong>2 unsaved changes.</strong> Threshold change requires Spiro Business approval (maker/checker per role matrix).</div></div>
+
+  <div class="card">
+    <div class="config-row">
+      <div><div class="config-title">KYC API provider</div><div class="config-desc">Swap providers without code change · effective on next call</div><div class="config-default">Default · Smile ID</div></div>
+      <div><select class="select"><option>Smile ID</option><option>Jumio</option><option>Onfido</option></select></div>
+      <div><span class="badge badge-green">Live</span></div>
+    </div>
+    <div class="config-row">
+      <div><div class="config-title">NIN / NIRA check</div><div class="config-desc">Cross-check NIN against Uganda national ID database</div><div class="config-default">Default · On</div></div>
+      <div><div class="toggle"><div class="toggle-switch on"></div><span class="text-sm">Enabled</span></div></div>
+      <div><span class="badge badge-green">Active</span></div>
+    </div>
+    <div class="config-row">
+      <div><div class="config-title">Biometric match threshold</div><div class="config-desc">Scores below this enter Refer queue</div><div class="config-default">Default · 0.75 · Recommended 0.70 – 0.85</div></div>
+      <div><div class="flex items-center gap-3"><div class="slider-track" style="flex:1;"><div class="slider-fill" style="width:78%;"></div><div class="slider-thumb" style="left:78%;"></div></div><div class="text-sm fw-600">0.78</div></div></div>
+      <div><span class="badge badge-warning">Pending</span></div>
+    </div>
+    <div class="config-row">
+      <div><div class="config-title">Liveness check</div><div class="config-desc">Active blink/smile prompt during photo capture (AB-02)</div><div class="config-default">Default · On</div></div>
+      <div><div class="toggle"><div class="toggle-switch on"></div><span class="text-sm">Enabled</span></div></div>
+      <div><span class="badge badge-green">Active</span></div>
+    </div>
+    <div class="config-row">
+      <div><div class="config-title">Required documents</div><div class="config-desc">Documents captured during onboarding</div><div class="config-default">Default · Driving permit, NIN card, Guarantor ID</div></div>
+      <div><div class="flex flex-col gap-2"><label class="text-xs"><input type="checkbox" checked> Driving permit</label><label class="text-xs"><input type="checkbox" checked> NIN card</label><label class="text-xs"><input type="checkbox" checked> Guarantor ID</label><label class="text-xs"><input type="checkbox"> Proof of address</label></div></div>
+      <div><span class="badge badge-green">Active</span></div>
+    </div>
+    <div class="config-row">
+      <div><div class="config-title">Duplicate detection</div><div class="config-desc">Block duplicate NIN/phone across Spiro DB</div><div class="config-default">Platform-wide · cannot be disabled</div></div>
+      <div><div class="toggle"><div class="toggle-switch on" style="opacity:0.5;"></div><span class="text-sm muted">Always on</span></div></div>
+      <div><span class="badge">Locked</span></div>
+    </div>
+    <div class="config-row">
+      <div><div class="config-title">Fallback queue SLA</div><div class="config-desc">If KYC API unavailable, how long Ops have to verify</div><div class="config-default">Default · 4 hours</div></div>
+      <div><div class="flex items-center gap-2"><input class="input" style="width:80px;" value="4"><span class="text-sm muted">hours</span></div></div>
+      <div><span class="badge badge-green">Active</span></div>
+    </div>
+  </div>
+`;
+
+VIEWS['fin-risk'] = ()=>`
+  <div class="view-header">
+    <div><div class="crumb">Financier Admin</div><h2 class="view-title">Risk & decisioning</h2><div class="view-sub">Score band thresholds · guarantor weight · geo signal · A/B test status</div></div>
+  </div>
+
+  <div class="grid grid-2 gap-4">
+    <div class="card">
+      <div class="card-header"><h4>Risk band thresholds</h4><span class="badge badge-info">Maker / Checker</span></div>
+      <div class="text-xs muted mb-3">Per-financier · changes require Spiro Business approval.</div>
+      <div class="risk-bar mb-2">
+        <div style="position:absolute;left:0;width:30%;height:100%;background:var(--success);border-radius:999px 0 0 999px;"></div>
+        <div style="position:absolute;left:30%;width:30%;height:100%;background:var(--warning);"></div>
+        <div style="position:absolute;left:60%;width:40%;height:100%;background:var(--danger);border-radius:0 999px 999px 0;"></div>
+      </div>
+      <div class="grid grid-3 gap-3 mt-3">
+        <div><div class="text-xs muted">Auto-approve</div><div class="text-sm fw-600">0 – 30</div><input class="input mt-2" value="30"></div>
+        <div><div class="text-xs muted">Human review</div><div class="text-sm fw-600">31 – 60</div><input class="input mt-2" value="60"></div>
+        <div><div class="text-xs muted">Auto-decline</div><div class="text-sm fw-600">61 – 100</div><input class="input mt-2" value="100" disabled></div>
+      </div>
+      <div class="alert alert-info mt-4"><div class="text-xs">A/B test <strong>AB-03</strong> running · conservative vs. permissive · winning variant selected after 8 weeks.</div></div>
+    </div>
+
+    <div class="card">
+      <div class="card-header"><h4>Guarantor weight</h4><span class="badge">Spiro Finance owned</span></div>
+      <div class="text-xs muted mb-3">How much guarantor profile influences applicant's risk score.</div>
+      <div class="flex items-center gap-3 mt-4"><div class="slider-track" style="flex:1;"><div class="slider-fill" style="width:20%;"></div><div class="slider-thumb" style="left:20%;"></div></div><div class="text-lg fw-700">20%</div></div>
+      <div class="risk-legend"><span>0% (ignore)</span><span>50% (heavy)</span></div>
+      <div class="divider"></div>
+      <div class="text-xs muted fw-600 mb-2" style="text-transform:uppercase;">Geo-risk signal</div>
+      <div class="toggle"><div class="toggle-switch on"></div><span class="text-sm">Include sub-county heat map (monthly)</span></div>
+    </div>
+  </div>
+`;
+
+VIEWS['fin-roles'] = ()=>`
+  <div class="view-header">
+    <div><div class="crumb">Financier Admin</div><h2 class="view-title">Roles & approval matrix</h2><div class="view-sub">Who can change what · maker / checker model · audit-logged</div></div>
+    <span class="badge badge-green">Per PRD</span>
+  </div>
+
+  <div class="card">
+    <table class="table">
+      <thead><tr><th>Role</th><th>Who</th><th>Access</th><th>Maker (can change)</th><th>Checker (must approve)</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge badge-green">Platform Super Admin</span></td><td>Spiro Eng / PM</td><td>Full r+w</td><td>All params, all financiers</td><td>None · immediate effect, logged</td></tr>
+        <tr><td><span class="badge badge-info">Financier Admin</span></td><td>Financier ops lead</td><td>R+w own tenant</td><td>All own-tenant params</td><td>Spiro Business · for risk thresholds</td></tr>
+        <tr><td><span class="badge badge-warning">Spiro Ops Manager</span></td><td>Spiro Ops lead</td><td>R + selected w</td><td>Notification, SLAs, fallback</td><td>None · immediate effect, logged</td></tr>
+        <tr><td><span class="badge">Spiro CX Support</span></td><td>Spiro CX team</td><td>R + limited w</td><td>Queue overrides, status</td><td>Ops Manager · for field changes</td></tr>
+        <tr><td><span class="badge badge-danger">Compliance / Legal</span></td><td>Spiro Legal</td><td>R all · w compliance</td><td>Consent, residency, retention</td><td>Legal sign-off · version-stamped</td></tr>
+        <tr><td><span class="badge">Auditor</span></td><td>Internal / external</td><td>Read only</td><td>—</td><td>N/A</td></tr>
+      </tbody>
+    </table>
+  </div>
+`;
+
+VIEWS['fin-webhook'] = ()=>`
+  <div class="view-header">
+    <div><div class="crumb">Financier Admin</div><h2 class="view-title">Webhook integration · Spiro → Union (Adara)</h2><div class="view-sub">Reverse data transfer · payload delivered within 60s of credit approval</div></div>
+    <span class="badge badge-success">Healthy</span>
+  </div>
+
+  <div class="card mb-4">
+    <div class="grid grid-2 gap-4">
+      <div class="field"><label class="field-label">Endpoint URL</label><input class="input" value="https://api.union.ug/v2/adara/spiro/cx-onboard" readonly><div class="field-hint">Locked · configured by Engineering at integration time</div></div>
+      <div class="field"><label class="field-label">Retry policy</label><input class="input" value="Exponential backoff · max 3 retries" readonly><div class="field-hint">Non-configurable · Ops alerted after 3rd failure</div></div>
+    </div>
+    <div class="grid grid-3 gap-4 mt-3">
+      <div class="kpi" style="padding:14px;"><div class="kpi-label" style="font-size:10px;">Delivery success · 24h</div><div class="kpi-value" style="font-size:22px;">99.4%</div></div>
+      <div class="kpi" style="padding:14px;"><div class="kpi-label" style="font-size:10px;">Avg. latency</div><div class="kpi-value" style="font-size:22px;">2.1s</div></div>
+      <div class="kpi" style="padding:14px;"><div class="kpi-label" style="font-size:10px;">Failed (7d)</div><div class="kpi-value" style="font-size:22px;color:var(--warning);">11</div></div>
+    </div>
+  </div>
+`;
+
+VIEWS['fin-history'] = ()=>`
+  <div class="view-header">
+    <div><div class="crumb">Financier Admin</div><h2 class="view-title">Change history</h2><div class="view-sub">Every configuration change · who · when · approved by</div></div>
+    <button class="btn btn-secondary btn-sm">Export CSV</button>
+  </div>
+
+  <div class="card">
+    <table class="table">
+      <thead><tr><th>When</th><th>What changed</th><th>Changed by</th><th>Approved by</th><th>State</th></tr></thead>
+      <tbody>
+        <tr><td>Today · 11:24</td><td>Biometric threshold 0.75 → 0.78</td><td>M. Wanjiku (Fin Admin)</td><td>—</td><td><span class="badge badge-warning">Pending</span></td></tr>
+        <tr><td>Yest · 16:08</td><td>Added "Proof of address" to required docs</td><td>M. Wanjiku</td><td>R. Atieno (CX Support)</td><td><span class="badge badge-success">Live</span></td></tr>
+        <tr><td>Apr 28 · 09:51</td><td>SMS template updated (EN + Luganda)</td><td>R. Atieno</td><td>Auto-approved</td><td><span class="badge badge-success">Live</span></td></tr>
+        <tr><td>Apr 24 · 14:33</td><td>Risk band thresholds 0–30 / 31–60 / 61–100</td><td>D. Otieno (Super Admin)</td><td>—</td><td><span class="badge badge-success">Live</span></td></tr>
+        <tr><td>Apr 18 · 11:12</td><td>Liveness threshold 0.70 → 0.75</td><td>M. Wanjiku</td><td>D. Otieno (Spiro Business)</td><td><span class="badge badge-success">Live</span></td></tr>
+        <tr><td>Apr 12 · 09:00</td><td>KYC provider Onfido → Smile ID</td><td>D. Otieno</td><td>Compliance · A. Ouedraogo</td><td><span class="badge badge-success">Live</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+`;
+
+/* ================ COMPLIANCE VIEWS ================ */
+VIEWS['comp-audit'] = ()=>`
+  <div class="view-header">
+    <div><div class="crumb">Compliance / Legal</div><h2 class="view-title">Audit log</h2><div class="view-sub">Every action timestamped · immutable · cannot be modified post-write</div></div>
+    <div class="flex gap-2"><button class="btn btn-secondary btn-sm">Export CSV</button></div>
+  </div>
+
+  <div class="grid grid-4 mb-4">
+    <div class="kpi"><div class="kpi-label">Events · 24h</div><div class="kpi-value">12,481</div></div>
+    <div class="kpi"><div class="kpi-label">Consent capture</div><div class="kpi-value">100%</div></div>
+    <div class="kpi"><div class="kpi-label">Last bias audit</div><div class="kpi-value">Apr 18</div></div>
+    <div class="kpi"><div class="kpi-label">Markets compliant</div><div class="kpi-value">3 / 3</div></div>
+  </div>
+
+  <div class="card" style="padding:0;">
+    <div style="padding:14px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+      <div class="fw-600 text-sm">Recent events</div>
+      <div class="flex gap-2"><select class="select" style="font-size:12px;padding:6px 10px;"><option>All events</option><option>KYC verifications</option><option>Decisions</option><option>Config changes</option></select><input class="input" placeholder="Search by case ID" style="font-size:12px;padding:6px 10px;"></div>
+    </div>
+    <table class="table">
+      <thead><tr><th>Timestamp</th><th>Event</th><th>Actor</th><th>Case / target</th><th>Result</th></tr></thead>
+      <tbody>
+        <tr><td class="text-xs muted">11:24:08<br>2026-05-11</td><td><div class="text-sm">Configuration change</div><div class="text-xs muted">Biometric threshold 0.75 → 0.78</div></td><td>M. Wanjiku<br><span class="text-xs muted">Financier Admin</span></td><td>Union UG</td><td><span class="badge badge-warning">Pending</span></td></tr>
+        <tr><td class="text-xs muted">09:29:14<br>2026-05-11</td><td><div class="text-sm">Loan ID issued</div><div class="text-xs muted">UN-2026-04812 via Adara webhook</div></td><td>System<br><span class="text-xs muted">Webhook</span></td><td>CM-0482</td><td><span class="badge badge-success">Success</span></td></tr>
+        <tr><td class="text-xs muted">09:29:02<br>2026-05-11</td><td><div class="text-sm">Auto-approval</div><div class="text-xs muted">Risk score 22/100 · band 0–30</div></td><td>System<br><span class="text-xs muted">ML v1.4</span></td><td>CM-0482 · Sarah Namuli</td><td><span class="badge badge-success">Approved</span></td></tr>
+        <tr><td class="text-xs muted">09:28:51<br>2026-05-11</td><td><div class="text-sm">KYC verification</div><div class="text-xs muted">NIN ✓ · Biometric 0.91 ✓ · Duplicate ✓</div></td><td>System<br><span class="text-xs muted">Smile ID</span></td><td>CM-0482</td><td><span class="badge badge-success">Pass</span></td></tr>
+        <tr><td class="text-xs muted">09:26:18<br>2026-05-11</td><td><div class="text-sm">Consent captured</div><div class="text-xs muted">Privacy policy v3.2 · Luganda</div></td><td>Sarah Namuli<br><span class="text-xs muted">Agent App</span></td><td>CM-0482</td><td><span class="badge badge-success">Recorded</span></td></tr>
+        <tr><td class="text-xs muted">09:18:42<br>2026-05-11</td><td><div class="text-sm">Auto-decline</div><div class="text-xs muted">Risk score 74/100 · band 61–100</div></td><td>System<br><span class="text-xs muted">ML v1.4</span></td><td>CM-0479</td><td><span class="badge badge-danger">Declined</span></td></tr>
+        <tr><td class="text-xs muted">09:14:33<br>2026-05-11</td><td><div class="text-sm">Webhook retry</div><div class="text-xs muted">Adara · attempt 2/3 · 503</div></td><td>System</td><td>CM-0478</td><td><span class="badge badge-warning">Retrying</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+`;
+
+VIEWS['comp-consent'] = ()=>`
+  <div class="view-header">
+    <div><div class="crumb">Compliance / Legal</div><h2 class="view-title">Consent tracking</h2><div class="view-sub">Per-applicant · version-stamped · re-captured on policy change</div></div>
+    <span class="badge badge-success">100% capture</span>
+  </div>
+
+  <div class="card mb-4">
+    <h4 class="mb-3">Current privacy policy</h4>
+    <div class="card" style="padding:14px;background:var(--bg);border:none;">
+      <div class="flex justify-between items-center"><div><div class="text-sm fw-600">v3.2 · Effective 2026-04-01</div><div class="text-xs muted">Languages: English, Luganda, Swahili, Kinyarwanda</div></div><span class="badge badge-green">Active</span></div>
+    </div>
+
+    <div class="text-xs muted fw-600 mb-2 mt-4" style="text-transform:uppercase;">Re-consent triggers</div>
+    <ul class="checklist">
+      <li><span class="check-dot ok">✓</span> Policy version change (any market)</li>
+      <li><span class="check-dot ok">✓</span> New data-sharing scope (e.g. new financier added)</li>
+      <li><span class="check-dot ok">✓</span> Material change to biometric retention</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h4 class="mb-3">Recent consent events</h4>
+    <table class="table">
+      <thead><tr><th>Timestamp</th><th>Applicant</th><th>Policy version</th><th>Language</th><th>Captured via</th></tr></thead>
+      <tbody>
+        <tr><td>09:26 · 2026-05-11</td><td>Sarah Namuli · CM-0482</td><td>v3.2</td><td>Luganda</td><td>Agent App</td></tr>
+        <tr><td>08:50 · 2026-05-11</td><td>Grace Nakato · CM-0480</td><td>v3.2</td><td>English</td><td>Agent App</td></tr>
+        <tr><td>08:18 · 2026-05-11</td><td>Moses Kintu · CM-0479</td><td>v3.2</td><td>Luganda</td><td>Agent App</td></tr>
+      </tbody>
+    </table>
+  </div>
+`;
+
+VIEWS['comp-bias'] = ()=>`
+  <div class="view-header">
+    <div><div class="crumb">Compliance / Legal</div><h2 class="view-title">ML model bias audit · v1.4</h2><div class="view-sub">Mandatory before ML decisions go live · annual cadence (financier can request extra)</div></div>
+    <span class="badge badge-success">Passed · Apr 18</span>
+  </div>
+
+  <div class="grid grid-2 gap-4">
+    <div class="card">
+      <h4 class="mb-3">Approval rate parity</h4>
+      <div class="mb-3"><div class="flex justify-between text-sm"><span>Male</span><span class="fw-600">67.4%</span></div><div class="bias-bar"><div class="bias-bar-fill" style="width:67%;"></div></div></div>
+      <div class="mb-3"><div class="flex justify-between text-sm"><span>Female</span><span class="fw-600">66.1%</span></div><div class="bias-bar"><div class="bias-bar-fill" style="width:66%;"></div></div></div>
+      <div class="mb-3"><div class="flex justify-between text-sm"><span>Urban Kampala</span><span class="fw-600">71.2%</span></div><div class="bias-bar"><div class="bias-bar-fill" style="width:71%;"></div></div></div>
+      <div class="mb-3"><div class="flex justify-between text-sm"><span>Rural / peri-urban</span><span class="fw-600">62.4%</span></div><div class="bias-bar"><div class="bias-bar-fill warn" style="width:62%;"></div></div></div>
+      <div class="alert alert-warning mt-3"><div class="text-xs"><strong>8.8 pp gap</strong> urban vs. rural · within tolerance (≤10pp) · flagged for monitoring at next retrain.</div></div>
+    </div>
+    <div class="card">
+      <h4 class="mb-3">Audit framework</h4>
+      <ul class="checklist">
+        <li><span class="check-dot ok">✓</span> External reviewer engaged (Q2 vendor)</li>
+        <li><span class="check-dot ok">✓</span> Hold-out test set per region + gender</li>
+        <li><span class="check-dot ok">✓</span> Approval rate parity tested</li>
+        <li><span class="check-dot ok">✓</span> False positive / false negative rates by cohort</li>
+        <li><span class="check-dot ok">✓</span> Bias report filed with legal</li>
+        <li><span class="check-dot ok">✓</span> Sign-off by Spiro Legal · 2026-04-18</li>
+      </ul>
+      <div class="flex gap-2 mt-4"><button class="btn btn-secondary btn-sm">Download full report</button><button class="btn btn-ghost btn-sm">Request additional audit</button></div>
+    </div>
+  </div>
+`;
+
+VIEWS['comp-residency'] = ()=>`
+  <div class="view-header">
+    <div><div class="crumb">Compliance / Legal</div><h2 class="view-title">Data residency · by market</h2><div class="view-sub">Per-market enforcement at DB write · configured by financier in admin panel</div></div>
+    <span class="badge badge-info">3 markets live</span>
+  </div>
+
+  <div class="grid grid-3 gap-4">
+    <div class="market-card"><div class="flag">🇺🇬</div><div style="flex:1;"><div class="text-sm fw-600">Uganda</div><div class="text-xs muted">In-country storage · biometric 90d</div><span class="badge badge-success mt-2">Compliant</span></div></div>
+    <div class="market-card"><div class="flag">🇰🇪</div><div style="flex:1;"><div class="text-sm fw-600">Kenya</div><div class="text-xs muted">DPA 2019 · biometric 90d</div><span class="badge badge-success mt-2">Compliant</span></div></div>
+    <div class="market-card"><div class="flag">🇷🇼</div><div style="flex:1;"><div class="text-sm fw-600">Rwanda</div><div class="text-xs muted">Law 058/2021 · in-country biometric</div><span class="badge badge-success mt-2">Compliant</span></div></div>
+  </div>
+
+  <div class="alert alert-info mt-4"><div class="text-xs"><strong>Per PRD R5:</strong> Legal review by 2026-05; in-country biometric storage provisioned where required.</div></div>
+`;
+
+VIEWS['comp-retention'] = ()=>`
+  <div class="view-header">
+    <div><div class="crumb">Compliance / Legal</div><h2 class="view-title">Retention & deletion policy</h2><div class="view-sub">How long Spiro stores each data class · regulatory minimums vs. configurable</div></div>
+    <span class="badge">Defaults shown</span>
+  </div>
+
+  <div class="card">
+    <table class="table">
+      <thead><tr><th>Data class</th><th>Retention</th><th>Trigger</th><th>Configurable</th></tr></thead>
+      <tbody>
+        <tr><td>Biometric (face match)</td><td>90 days from application close</td><td>Auto-delete pipeline (daily)</td><td><span class="badge">No · regulatory floor</span></td></tr>
+        <tr><td>PII (name, NIN, phone)</td><td>7 years (default)</td><td>Manual purge per financier policy</td><td><span class="badge badge-green">Per market / financier</span></td></tr>
+        <tr><td>Loan repayment history</td><td>10 years</td><td>Anonymised, retained for ML training</td><td><span class="badge">No</span></td></tr>
+        <tr><td>Audit log</td><td>7 years (default)</td><td>Append-only, no deletion before TTL</td><td><span class="badge badge-green">Per market</span></td></tr>
+        <tr><td>Consent records</td><td>Lifetime of customer + 7 years</td><td>Version-stamped, never overwritten</td><td><span class="badge">No</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+`;
+
+VIEWS['agent-mobile'] = ()=>`
+  <div class="view-header">
+    <div><div class="crumb">Swap Agent</div><h2 class="view-title">Mobile preview</h2><div class="view-sub">What the agent sees on the Spiro Connect Android app · for reference & QA</div></div>
+  </div>
+  <div class="phone-grid">
+
+    <div class="phone-wrap"><div class="screen-label">Home</div>
+    <div class="phone-frame"><div class="phone-screen">
+      <div class="phone-statusbar"><span>09:24</span><span>● ●●● 100%</span></div>
+      <div class="phone-header"><div style="flex:1"><div class="phone-title">Spiro Connect</div><div class="text-xs muted">Kawempe · branch 04</div></div></div>
+      <div class="phone-body">
+        <div class="grid grid-2 gap-3 mb-3"><div class="kpi" style="padding:10px;"><div class="kpi-label" style="font-size:9px;">Leads</div><div class="kpi-value" style="font-size:18px;">7</div></div><div class="kpi" style="padding:10px;"><div class="kpi-label" style="font-size:9px;">Approved</div><div class="kpi-value" style="font-size:18px;color:var(--success);">5</div></div></div>
+        <div class="card" style="padding:10px;margin-bottom:6px;"><div class="flex justify-between items-center"><div><div class="text-sm fw-600">Patrick Okello</div><div class="text-xs muted">CM-0481</div></div><span class="badge badge-success">Approved</span></div></div>
+        <div class="card" style="padding:10px;margin-bottom:6px;"><div class="flex justify-between items-center"><div><div class="text-sm fw-600">Grace Nakato</div><div class="text-xs muted">CM-0480</div></div><span class="badge badge-warning">Under review</span></div></div>
+      </div>
+      <div class="phone-footer"><button class="btn btn-primary btn-block">+ New lead</button></div>
+    </div></div></div>
+
+    <div class="phone-wrap"><div class="screen-label">Liveness capture</div>
+    <div class="phone-frame"><div class="phone-screen">
+      <div class="phone-statusbar"><span>09:27</span><span>● ●●● 100%</span></div>
+      <div class="phone-header"><div class="phone-title">Liveness check</div></div>
+      <div class="phone-body" style="background:#1A1F1C;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+        <div style="width:160px;height:200px;border-radius:50% / 40%;border:3px dashed var(--spiro-green);display:flex;align-items:center;justify-content:center;margin-bottom:20px;background:rgba(0,135,90,0.15);"><div style="font-size:50px;">👤</div></div>
+        <div style="color:#fff;font-family:'Poppins';font-weight:600;font-size:14px;margin-bottom:4px;">Blink twice slowly</div>
+        <div style="color:rgba(255,255,255,0.6);font-size:12px;text-align:center;margin-bottom:16px;">Hold steady · face the camera</div>
+        <div style="background:rgba(255,255,255,0.1);padding:6px 12px;border-radius:999px;font-size:11px;"><span style="color:var(--success);">●</span> 0.92 / 0.75</div>
+      </div>
+      <div class="phone-footer" style="background:#1A1F1C;border-top-color:rgba(255,255,255,0.1);"><button class="btn btn-primary btn-block">Capture</button></div>
+    </div></div></div>
+
+    <div class="phone-wrap"><div class="screen-label">Approved</div>
+    <div class="phone-frame"><div class="phone-screen">
+      <div class="phone-statusbar"><span>09:29</span><span>● ●●● 100%</span></div>
+      <div class="phone-header"><div class="phone-title">Approved</div></div>
+      <div class="phone-body">
+        <div class="text-center" style="padding:14px 0;">
+          <div style="width:70px;height:70px;margin:0 auto 16px;border-radius:50%;background:var(--success-bg);display:flex;align-items:center;justify-content:center;font-size:32px;">✓</div>
+          <h4>Approved!</h4>
+          <div class="text-xs muted">28 seconds end-to-end</div>
+        </div>
+        <div class="card" style="background:var(--spiro-green-light);border:none;padding:14px;">
+          <div class="text-xs fw-600" style="text-transform:uppercase;color:var(--spiro-green-dark);">Loan ID</div>
+          <div style="font-family:'Poppins';font-weight:700;font-size:20px;color:var(--spiro-green-dark);">UN-2026-04812</div>
+        </div>
+        <div class="text-xs muted mt-3"><strong>UGX 280,000</strong> downpayment due · pay via USSD or app</div>
+      </div>
+    </div></div></div>
+
+  </div>
+`;
+
+</body>
+</html>
