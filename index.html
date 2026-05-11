@@ -180,84 +180,37 @@ a{color:var(--spiro-green);text-decoration:none;cursor:pointer}a:hover{text-deco
 .check-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--border);flex-shrink:0;margin-top:2px}
 .check-dot.ok{background:var(--success);border-color:var(--success);color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center}
 .check-dot.err{background:var(--danger);border-color:var(--danger);color:#fff;font-size:10px;display:flex;align-items:center;justify-content:center}
+.channel-toggle{display:inline-flex;gap:4px;background:var(--bg);padding:4px;border-radius:8px}
+.ch-opt{padding:6px 12px;font-size:var(--fs-sm);color:var(--text-muted);border-radius:6px;cursor:pointer;text-decoration:none}
+.ch-opt:hover{color:var(--text);background:rgba(255,255,255,.6);text-decoration:none}
+.ch-opt.active{background:var(--surface);color:var(--spiro-green-dark);font-weight:600;box-shadow:var(--shadow-sm)}
+.progress-track{height:6px;background:var(--bg);border-radius:3px;overflow:hidden;margin:8px 0}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--spiro-green),var(--spiro-green-dark));transition:width .4s ease;border-radius:3px}
+.progress-fill.indeterminate{background:linear-gradient(90deg,transparent,var(--spiro-green),transparent);background-size:50% 100%;background-repeat:no-repeat;animation:slide 1.4s linear infinite;width:100% !important}
+@keyframes slide{0%{background-position:-50% 0}100%{background-position:150% 0}}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid var(--border);border-top-color:var(--spiro-green);border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle}
+@keyframes spin{to{transform:rotate(360deg)}}
+.pulse-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--spiro-green);animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.75)}}
 </style>
 </head>
 <body>
 
 <nav class="topnav">
   <div class="topnav-inner">
-    <div class="brand" onclick="showSection('hub')">
+    <div class="brand">
       <div class="brand-mark">S</div>
-      <div>Spiro <span class="brand-sub">· KYC V2 Prototype</span></div>
+      <div>Spiro <span class="brand-sub">· KYC V2 · Internal Portal</span></div>
     </div>
     <div class="nav-links">
-      <a class="nav-link active" data-nav="hub" onclick="showSection('hub')">Overview</a>
-      <a class="nav-link" data-nav="portal" onclick="showSection('portal')">Internal Portal</a>
-      <a class="nav-link" data-nav="rider" onclick="showSection('rider')">Rider experience</a>
+      <a class="nav-link" onclick="modal('What\\'s in this prototype', `<p class=text-sm style=margin-bottom:12px>A front-end demo of the V2 KYC flow for Spiro asset financing.</p><p class=text-sm style=margin-bottom:12px><strong>4 roles</strong> in the sidebar — click any to expand its sub-views.</p><p class=text-sm style=margin-bottom:12px><strong>Form validation</strong> runs on the New lead and CX data form views with live regex feedback.</p><p class=text-sm>Source: Asset Financing — PRDs.pdf. All data is illustrative; no real API calls.</p>`)">About</a>
+      <a class="nav-link" href="https://github.com/sanjaykujur-pixel/spiro-kyc-prototype" target="_blank">GitHub ↗</a>
     </div>
   </div>
 </nav>
 
-<!-- ============== HUB ============== -->
-<section id="section-hub" class="section active">
-<div class="container">
-  <div class="page-header">
-    <div class="badge badge-green mb-3">V2 — KYC Flow Prototype</div>
-    <h1 class="page-title">Spiro-owned digital KYC, end-to-end</h1>
-    <p class="page-subtitle">One internal portal for Spiro & Financier teams · one rider-facing experience. Click into either to walk the flow.</p>
-  </div>
-
-  <div class="grid grid-2 mb-6">
-    <a class="persona-card" onclick="showSection('portal')">
-      <div class="persona-icon">🖥️</div>
-      <h3 class="persona-title">Internal Portal</h3>
-      <div class="persona-desc">A single role-based portal for everyone inside Spiro and partner financiers. Sub-roles in the sidebar surface different views and tasks per role.</div>
-      <div class="persona-meta">4 roles · 18 sub-views · validation + failure paths</div>
-    </a>
-    <a class="persona-card" onclick="showSection('rider')">
-      <div class="persona-icon">🛵</div>
-      <h3 class="persona-title">Rider experience</h3>
-      <div class="persona-desc">End customer touchpoints — SMS thread, in-app status, under-review and declined states.</div>
-      <div class="persona-meta">4 notification states · cross-channel</div>
-    </a>
-  </div>
-
-  <div class="card mb-6">
-    <div class="card-header"><div><h3 class="card-title">Roles in the Internal Portal</h3><div class="card-sub">Sidebar groups each role's sub-views</div></div></div>
-    <div class="grid grid-4">
-      <div><div class="text-xs muted fw-600" style="text-transform:uppercase;">📱 Swap Agent</div><ul class="checklist mt-2"><li>Dashboard</li><li>New lead</li><li>CX data form</li><li>KYC verification</li><li>My applications</li></ul></div>
-      <div><div class="text-xs muted fw-600" style="text-transform:uppercase;">🛡 Spiro Ops</div><ul class="checklist mt-2"><li>Review queue</li><li>Refer queue</li><li>Webhook failures</li><li>Geo-risk heat map</li><li>ML model health</li></ul></div>
-      <div><div class="text-xs muted fw-600" style="text-transform:uppercase;">⚙ Financier Admin</div><ul class="checklist mt-2"><li>Identity & KYC config</li><li>Risk & decisioning</li><li>Roles & approvals</li><li>Webhook config</li><li>Change history</li></ul></div>
-      <div><div class="text-xs muted fw-600" style="text-transform:uppercase;">📜 Compliance / Legal</div><ul class="checklist mt-2"><li>Audit log</li><li>Consent tracking</li><li>ML bias audit</li><li>Data residency</li><li>Retention policy</li></ul></div>
-    </div>
-  </div>
-
-  <div class="card mb-6">
-    <div class="card-header"><div><h3 class="card-title">End-to-end flow</h3><div class="card-sub">9 steps · 2 decision gates · cross-role handoffs</div></div><span class="badge badge-info">Reference</span></div>
-    <div style="overflow-x:auto;">
-      <table class="table table-compact" style="min-width:720px;">
-        <thead><tr><th>#</th><th>Step</th><th>Owner</th><th>Role</th><th>Outcome</th></tr></thead>
-        <tbody>
-          <tr><td><span class="badge badge-green">A1</span></td><td>Lead Capture</td><td>Agent App / Spiro</td><td>Swap Agent</td><td>Lead saved to Spiro DB</td></tr>
-          <tr><td><span class="badge badge-green">B2</span></td><td>CX Data Form (23 fields + photo)</td><td>Web / App / Spiro</td><td>Swap Agent</td><td>Form submitted, validated</td></tr>
-          <tr style="background:var(--warning-bg);"><td><span class="badge badge-warning">C3</span></td><td><strong>Identity Verification</strong></td><td>KYC API · NIRA / IPRS</td><td>Agent + Ops</td><td>Pass · Refer (SLA 4h) · Fail</td></tr>
-          <tr style="background:var(--warning-bg);"><td><span class="badge badge-warning">D4</span></td><td><strong>AI Risk Score</strong></td><td>ML model · Spiro</td><td>All</td><td>0–30 Approve · 31–60 Review · 61–100 Decline</td></tr>
-          <tr><td><span class="badge badge-green">D5</span></td><td>Credit Decisioning</td><td>Spiro internal</td><td>Ops Team</td><td>Top 3 risk factors shown</td></tr>
-          <tr><td><span class="badge badge-green">E6</span></td><td>Loan ID Creation</td><td>Webhook → Union (Adara)</td><td>Financier</td><td>Loan ID ≤ 60s</td></tr>
-          <tr><td><span class="badge badge-green">E7</span></td><td>CX Notification</td><td>Spiro Platform</td><td>End Customer</td><td>SMS + in-app</td></tr>
-          <tr><td><span class="badge">F8</span></td><td>Downpayment <span class="muted">(unchanged)</span></td><td>Spiro / PSP</td><td>End Customer</td><td>USSD / app</td></tr>
-          <tr><td><span class="badge">F9</span></td><td>Vehicle Deployment <span class="muted">(unchanged)</span></td><td>Spiro</td><td>Swap Agent</td><td>Vehicle handed over</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="alert alert-info"><div><strong>Prototype scope.</strong> Front-end only — no real API calls. Form validation uses real regex. Source PRD: <em>Asset Financing — PRDs.pdf</em>.</div></div>
-</div>
-</section>
-
 <!-- ============== PORTAL ============== -->
-<section id="section-portal" class="section">
+<section id="section-portal" class="section active">
 <div class="portal-layout">
 
   <!-- Sidebar: roles + sub-roles -->
@@ -280,7 +233,8 @@ a{color:var(--spiro-green);text-decoration:none;cursor:pointer}a:hover{text-deco
         <a class="role-item" onclick="showView('agent-cx',this)">CX data form</a>
         <a class="role-item" onclick="showView('agent-kyc',this)">KYC verification</a>
         <a class="role-item" onclick="showView('agent-applications',this)">My applications</a>
-        <a class="role-item" onclick="showView('agent-mobile',this)">Mobile preview</a>
+        <a class="role-item" onclick="showView('agent-tickets',this)">Manual tickets</a>
+        <a class="role-item" onclick="showView('agent-passport',this)">Rider passport ✨</a>
       </div>
     </div>
 
@@ -289,8 +243,11 @@ a{color:var(--spiro-green);text-decoration:none;cursor:pointer}a:hover{text-deco
       <div class="role-items">
         <a class="role-item" onclick="showView('ops-queue',this)">Review queue</a>
         <a class="role-item" onclick="showView('ops-case',this)">Case detail</a>
+        <a class="role-item" onclick="showView('ops-connections',this)">Connections ✨</a>
+        <a class="role-item" onclick="showView('ops-device',this)">Device & Velocity ✨</a>
         <a class="role-item" onclick="showView('ops-webhook',this)">Webhook failures</a>
         <a class="role-item" onclick="showView('ops-geo',this)">Geo-risk heat map</a>
+        <a class="role-item" onclick="showView('ops-api',this)">API health ✨</a>
         <a class="role-item" onclick="showView('ops-model',this)">ML model health</a>
       </div>
     </div>
@@ -300,6 +257,7 @@ a{color:var(--spiro-green);text-decoration:none;cursor:pointer}a:hover{text-deco
       <div class="role-items">
         <a class="role-item" onclick="showView('fin-identity',this)">Identity & KYC</a>
         <a class="role-item" onclick="showView('fin-risk',this)">Risk & decisioning</a>
+        <a class="role-item" onclick="showView('fin-journey',this)">Journey builder ✨</a>
         <a class="role-item" onclick="showView('fin-roles',this)">Roles & approvals</a>
         <a class="role-item" onclick="showView('fin-webhook',this)">Webhook config</a>
         <a class="role-item" onclick="showView('fin-history',this)">Change history</a>
@@ -309,6 +267,7 @@ a{color:var(--spiro-green);text-decoration:none;cursor:pointer}a:hover{text-deco
     <div class="role-group" data-role="compliance">
       <div class="role-header" onclick="toggleRole('compliance')"><span class="role-icon">📜</span> Compliance / Legal <span class="role-chevron">▶</span></div>
       <div class="role-items">
+        <a class="role-item" onclick="showView('comp-policies',this)">Policies & T&Cs ✨</a>
         <a class="role-item" onclick="showView('comp-audit',this)">Audit log</a>
         <a class="role-item" onclick="showView('comp-consent',this)">Consent tracking</a>
         <a class="role-item" onclick="showView('comp-bias',this)">ML bias audit</a>
@@ -324,111 +283,14 @@ a{color:var(--spiro-green);text-decoration:none;cursor:pointer}a:hover{text-deco
 </div>
 </section>
 
-<!-- ============== RIDER ============== -->
-<section id="section-rider" class="section">
-<div class="container">
-  <div class="page-header">
-    <div class="badge badge-green mb-3">End Customer · Rider</div>
-    <h1 class="page-title">Rider experience — clear, transparent, fast</h1>
-    <p class="page-subtitle">Boda-boda riders never visit a branch. They receive SMS + in-app updates at every decision stage.</p>
-  </div>
-
-  <div class="phone-grid">
-
-    <div class="phone-wrap"><div class="screen-label">SMS · Approved</div>
-    <div class="phone-frame"><div class="phone-screen" style="background:#F2F4F3;">
-      <div class="phone-statusbar"><span>09:30</span><span>● ●●● 88%</span></div>
-      <div class="phone-header" style="background:#fff;"><div style="flex:1"><div class="phone-title">Spiro</div><div class="text-xs muted">SMS · Service messages</div></div></div>
-      <div class="phone-body" style="padding:14px;">
-        <div class="sms-meta text-center">Today · 09:26</div>
-        <div class="sms-bubble"><div class="sms-sender">Spiro</div>Hi Sarah, your Spiro EV application has been received. We'll text you the decision shortly.</div>
-        <div class="sms-meta text-center mt-3">Today · 09:28</div>
-        <div class="sms-bubble"><div class="sms-sender">Spiro</div>Identity verification passed ✓. Reviewing your application now.</div>
-        <div class="sms-meta text-center mt-3">Today · 09:29</div>
-        <div class="sms-bubble" style="background:var(--spiro-green-light);color:var(--text);"><div class="sms-sender">Spiro</div>🎉 Approved! Loan ID: <strong>UN-2026-04812</strong>. Downpayment: UGX 280,000. Pay via *182# or Spiro app.</div>
-      </div>
-    </div></div></div>
-
-    <div class="phone-wrap"><div class="screen-label">In-app · Loan ID</div>
-    <div class="phone-frame"><div class="phone-screen">
-      <div class="phone-statusbar"><span>09:31</span><span>● ●●● 88%</span></div>
-      <div class="phone-header"><div style="flex:1"><div class="phone-title">My application</div><div class="text-xs muted">Sarah Namuli · CM-0482</div></div></div>
-      <div class="phone-body">
-        <div class="card" style="background:var(--spiro-green-light);border:none;padding:18px;text-align:center;margin-bottom:18px;">
-          <div style="font-size:42px;">🎉</div>
-          <h4 style="color:var(--spiro-green-dark);margin-top:8px;">You're approved</h4>
-          <div style="font-family:'Poppins';font-weight:700;font-size:22px;color:var(--spiro-green-dark);margin-top:8px;">UN-2026-04812</div>
-        </div>
-        <div class="card" style="padding:14px;margin-bottom:8px;"><div class="flex justify-between items-center"><div><div class="text-xs muted">Amount due</div><div style="font-family:'Poppins';font-weight:700;font-size:20px;">UGX 280,000</div></div><span class="badge badge-warning">Pending</span></div></div>
-        <ul class="timeline mt-4">
-          <li class="timeline-item"><div class="timeline-dot done">✓</div><div><div class="timeline-title text-xs">Application submitted</div><div class="timeline-meta">09:26</div></div></li>
-          <li class="timeline-item"><div class="timeline-dot done">✓</div><div><div class="timeline-title text-xs">Identity verified</div><div class="timeline-meta">09:28</div></div></li>
-          <li class="timeline-item"><div class="timeline-dot done">✓</div><div><div class="timeline-title text-xs">Approved · Loan ID issued</div><div class="timeline-meta">09:29</div></div></li>
-          <li class="timeline-item"><div class="timeline-dot active">●</div><div><div class="timeline-title text-xs">Awaiting downpayment</div></div></li>
-        </ul>
-      </div>
-      <div class="phone-footer"><button class="btn btn-primary btn-block">Pay UGX 280,000</button></div>
-    </div></div></div>
-
-    <div class="phone-wrap"><div class="screen-label">Under review</div>
-    <div class="phone-frame"><div class="phone-screen">
-      <div class="phone-statusbar"><span>10:05</span><span>● ●●● 84%</span></div>
-      <div class="phone-header"><div style="flex:1"><div class="phone-title">My application</div><div class="text-xs muted">Grace Nakato · CM-0480</div></div></div>
-      <div class="phone-body">
-        <div class="outcome outcome-refer"><div class="outcome-title">⏱ Under review</div><div class="text-xs muted">We need a little more time. You'll hear from us within 4 hours.</div></div>
-        <ul class="timeline mt-4">
-          <li class="timeline-item"><div class="timeline-dot done">✓</div><div><div class="timeline-title text-xs">Submitted</div><div class="timeline-meta">09:38</div></div></li>
-          <li class="timeline-item"><div class="timeline-dot done">✓</div><div><div class="timeline-title text-xs">Initial checks</div><div class="timeline-meta">09:42</div></div></li>
-          <li class="timeline-item"><div class="timeline-dot active">●</div><div><div class="timeline-title text-xs">Manual review</div><div class="timeline-meta">Our team is taking a closer look</div></div></li>
-          <li class="timeline-item"><div class="timeline-dot">·</div><div><div class="timeline-title text-xs">Decision</div><div class="timeline-meta">By 13:42 today</div></div></li>
-        </ul>
-      </div>
-    </div></div></div>
-
-    <div class="phone-wrap"><div class="screen-label">Declined</div>
-    <div class="phone-frame"><div class="phone-screen">
-      <div class="phone-statusbar"><span>14:18</span><span>● ●●● 67%</span></div>
-      <div class="phone-header"><div style="flex:1"><div class="phone-title">My application</div><div class="text-xs muted">Moses Kintu · CM-0479</div></div></div>
-      <div class="phone-body">
-        <div class="outcome outcome-fail"><div class="outcome-title">Application not approved</div><div class="text-xs muted">We're sorry, we can't proceed at this time.</div></div>
-        <div class="card" style="padding:14px;margin-top:16px;"><div class="text-sm">You can re-apply after <strong>14 days</strong>. Call <strong>0800 422 422</strong> if this seems wrong.</div></div>
-        <div class="alert alert-info mt-4"><div class="text-xs"><strong>Your data is safe.</strong> All info encrypted per data protection law.</div></div>
-      </div>
-    </div></div></div>
-
-  </div>
-
-  <div class="card mt-6">
-    <div class="card-header"><h3 class="card-title">Notification matrix</h3><span class="badge badge-info">Module E</span></div>
-    <table class="table">
-      <thead><tr><th>Stage</th><th>Trigger</th><th>Channel</th><th>SLA</th><th>Tone</th></tr></thead>
-      <tbody>
-        <tr><td><span class="badge badge-green">Submitted</span></td><td>Form complete</td><td>SMS + in-app</td><td>≤ 60s</td><td>Confirmation</td></tr>
-        <tr><td><span class="badge badge-info">KYC pass</span></td><td>KYC API returns pass</td><td>SMS + in-app</td><td>≤ 60s</td><td>Reassurance</td></tr>
-        <tr><td><span class="badge badge-warning">Under review</span></td><td>KYC refer / human review</td><td>SMS + in-app</td><td>≤ 60s</td><td>Transparent SLA</td></tr>
-        <tr><td><span class="badge badge-success">Approved</span></td><td>Loan ID confirmed</td><td>SMS + in-app</td><td>≤ 2 min</td><td>Celebratory</td></tr>
-        <tr><td><span class="badge badge-danger">Declined</span></td><td>Auto-decline / KYC fail</td><td>SMS + in-app</td><td>≤ 60s</td><td>Respectful, generic</td></tr>
-      </tbody>
-    </table>
-  </div>
-</div>
-</section>
-
 <!-- =============== VIEW TEMPLATES =============== -->
 <template id="tpl-views"></template>
 
 <script>
-/* =================== NAVIGATION =================== */
-function showSection(name){
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.getElementById('section-'+name).classList.add('active');
-  document.querySelectorAll('.nav-link').forEach(n=>n.classList.remove('active'));
-  const n = document.querySelector('[data-nav='+name+']'); if(n) n.classList.add('active');
-  window.scrollTo(0,0);
-  if(name==='portal' && !document.getElementById('portal-main').innerHTML.trim()){
-    showView('agent-dashboard', document.querySelector('[data-role=agent] .role-item'));
-  }
-}
+/* =================== PORTAL INIT =================== */
+window.addEventListener('DOMContentLoaded', ()=>{
+  showView('agent-dashboard', document.querySelector('[data-role=agent] .role-item'));
+});
 
 const ROLES = {
   agent:      { name:'J. Mukasa',   role:'Swap Agent · Kawempe',    avatar:'JM' },
@@ -466,7 +328,7 @@ function showView(id, el){
 const RX = {
   name:    /^[A-Za-z][A-Za-z'\- ]{1,49}$/,                 // letters, space, hyphen, apostrophe, 2–50 chars
   phoneUG: /^\+?256[\s-]?7\d{2}[\s-]?\d{3}[\s-]?\d{3}$/,   // +256 7XX XXX XXX
-  phoneAny:/^\+?(256|254|250)[\s-]?\d{9}$/,                // UG/KE/RW E.164-ish
+  phoneAny:/^\+?(256|254|250)[\s-]?\d{3}[\s-]?\d{3}[\s-]?\d{3}$/, // UG/KE/RW · spaces/dashes allowed between 3-digit groups
   nin:     /^[A-Z]{2}[0-9A-Z]{12}$/,                        // 14 alphanumeric, starts 2 letters
   dob:     /^(0[1-9]|[12]\d|3[01])\s*\/\s*(0[1-9]|1[0-2])\s*\/\s*(19|20)\d{2}$/,
   income:  /^[0-9,]{4,}$/,                                  // numbers + commas, min 4 chars (≥1,000)
@@ -521,6 +383,63 @@ function attachValidation(scopeId){
 
 const VIEW_INIT = {};
 const VIEWS = {};
+
+/* =================== GLOBAL EVENT DELEGATION =================== */
+/* Makes every button/toggle/slider in the portal respond, so no touchpoint feels dead. */
+document.addEventListener('click', function(e){
+  const t = e.target;
+  if(t.classList && t.classList.contains('toggle-switch') && !t.style.opacity){
+    t.classList.toggle('on');
+    const label = t.parentElement.querySelector('span');
+    if(label) label.textContent = t.classList.contains('on') ? 'Enabled' : 'Disabled';
+    toast((t.classList.contains('on')?'Enabled':'Disabled')+' · pending save');
+    return;
+  }
+  if(t.tagName==='BUTTON' && !t.disabled && !t.dataset.handled){
+    const txt = (t.textContent||'').trim().toLowerCase();
+    const map = {
+      'save changes':'Configuration saved · v new published',
+      'publish':'Published',
+      'publish journey':'Journey published · v new live',
+      'approve':'CM-0482 approved · Loan ID issued',
+      'decline':'CM-0482 declined · customer notified',
+      'request more info':'Request sent to agent · case paused',
+      'manual push':'Webhook re-pushed · awaiting Adara response',
+      'export csv':'CSV export prepared',
+      'generate report':'Report generation queued',
+      'bulk action':'Bulk action panel · prototype demo',
+      'reset to default':'Reset · default steps restored',
+      'discard':'Changes discarded',
+      '+ bulk action':'Bulk action panel · prototype demo'
+    };
+    if(map[txt]){ toast(map[txt]); }
+  }
+});
+
+/* =================== TOAST + MODAL HELPERS =================== */
+function toast(msg, type){
+  let t = document.getElementById('toast-host');
+  if(!t){ t = document.createElement('div'); t.id='toast-host'; t.style.cssText='position:fixed;bottom:24px;right:24px;z-index:200;display:flex;flex-direction:column;gap:8px;'; document.body.appendChild(t); }
+  const el = document.createElement('div');
+  const bg = type==='err' ? 'var(--danger)' : (type==='warn' ? 'var(--warning)' : 'var(--spiro-green)');
+  el.style.cssText = 'background:'+bg+';color:#fff;padding:10px 14px;border-radius:8px;font-size:13px;box-shadow:0 4px 12px rgba(0,0,0,.15);max-width:320px;opacity:0;transition:opacity .2s;';
+  el.textContent = msg;
+  t.appendChild(el);
+  requestAnimationFrame(()=>{ el.style.opacity='1'; });
+  setTimeout(()=>{ el.style.opacity='0'; setTimeout(()=>el.remove(), 200); }, 2800);
+}
+function modal(title, bodyHtml, opts){
+  opts = opts||{};
+  let m = document.getElementById('modal-host');
+  if(m) m.remove();
+  m = document.createElement('div');
+  m.id='modal-host';
+  m.style.cssText='position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;';
+  m.innerHTML = '<div style="background:#fff;border-radius:12px;max-width:'+(opts.wide?'720px':'480px')+';width:100%;max-height:90vh;overflow-y:auto;"><div style="padding:18px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;"><h4>'+title+'</h4><span onclick="document.getElementById(\'modal-host\').remove()" style="cursor:pointer;font-size:22px;color:var(--text-muted);line-height:1;">×</span></div><div style="padding:20px;">'+bodyHtml+'</div></div>';
+  m.addEventListener('click', e=>{ if(e.target===m) m.remove(); });
+  document.body.appendChild(m);
+}
+function closeModal(){ const m=document.getElementById('modal-host'); if(m) m.remove(); }
 </script>
 
 <!-- VIEW DEFINITIONS injected below -->
@@ -529,7 +448,10 @@ const VIEWS = {};
 VIEWS['agent-dashboard'] = ()=>`
   <div class="view-header">
     <div><div class="crumb">Swap Agent</div><h2 class="view-title">Dashboard</h2><div class="view-sub">Kampala · Union branch 04 · Today 09:24</div></div>
-    <button class="btn btn-primary" onclick="document.querySelectorAll('.role-item')[1].click()">+ New lead</button>
+    <div class="flex gap-2">
+      <button class="btn btn-secondary" onclick="openTicketModal()">🎫 Raise manual ticket</button>
+      <button class="btn btn-primary" onclick="showView('agent-lead', document.querySelectorAll('[data-role=agent] .role-item')[1])">+ New lead</button>
+    </div>
   </div>
 
   <div class="grid grid-4 mb-6">
@@ -540,26 +462,76 @@ VIEWS['agent-dashboard'] = ()=>`
   </div>
 
   <div class="card mb-6">
-    <div class="card-header"><h4>Recent applications</h4><a class="text-xs" onclick="showView('agent-applications',document.querySelectorAll('.role-item')[4])">View all →</a></div>
+    <div class="card-header"><h4>Recent applications</h4><a class="text-xs" onclick="showView('agent-applications',document.querySelectorAll('[data-role=agent] .role-item')[4])">View all →</a></div>
     <table class="table">
-      <thead><tr><th>Case ID</th><th>Customer</th><th>Submitted</th><th>Stage</th><th>Status</th></tr></thead>
+      <thead><tr><th>Case ID</th><th>Customer</th><th>Submitted</th><th>Stage</th><th>Status</th><th></th></tr></thead>
       <tbody>
-        <tr><td><span class="case-id">CM-0482</span></td><td>Sarah Namuli</td><td>09:28</td><td>Loan ID issued</td><td><span class="badge badge-success">Approved</span></td></tr>
-        <tr><td><span class="case-id">CM-0481</span></td><td>Patrick Okello</td><td>09:12</td><td>Loan ID issued</td><td><span class="badge badge-success">Approved</span></td></tr>
-        <tr><td><span class="case-id">CM-0480</span></td><td>Grace Nakato</td><td>08:50</td><td>Ops review</td><td><span class="badge badge-warning">Under review</span></td></tr>
-        <tr><td><span class="case-id">CM-0479</span></td><td>Moses Kintu</td><td>08:18</td><td>Auto-decline</td><td><span class="badge badge-danger">Declined</span></td></tr>
-        <tr><td><span class="case-id">CM-0478</span></td><td>Brian Ssempa</td><td>07:52</td><td>Webhook retry</td><td><span class="badge badge-warning">Stalled</span></td></tr>
+        <tr><td><span class="case-id">CM-0482</span></td><td>Sarah Namuli</td><td>09:28</td><td>Loan ID issued</td><td><span class="badge badge-success">Approved</span></td><td><a onclick="openCase('CM-0482')">Open →</a></td></tr>
+        <tr><td><span class="case-id">CM-0481</span></td><td>Patrick Okello</td><td>09:12</td><td>Loan ID issued</td><td><span class="badge badge-success">Approved</span></td><td><a onclick="openCase('CM-0481')">Open →</a></td></tr>
+        <tr><td><span class="case-id">CM-0480</span></td><td>Grace Nakato</td><td>08:50</td><td>Ops review</td><td><span class="badge badge-warning">Under review</span></td><td><a onclick="openCase('CM-0480')">Open →</a></td></tr>
+        <tr><td><span class="case-id">CM-0479</span></td><td>Moses Kintu</td><td>08:18</td><td>Auto-decline</td><td><span class="badge badge-danger">Declined</span></td><td><a onclick="openCase('CM-0479')">Open →</a></td></tr>
+        <tr><td><span class="case-id">CM-0478</span></td><td>Brian Ssempa</td><td>07:52</td><td>Webhook retry</td><td><span class="badge badge-warning">Stalled</span></td><td><a onclick="openCase('CM-0478')">Open →</a></td></tr>
       </tbody>
     </table>
   </div>
 
-  <div class="alert alert-info"><div><strong>Offline mode reminder:</strong> If you lose signal, the app keeps saving locally. Submissions sync the moment you reconnect.</div></div>
+  <div class="grid grid-2 gap-4 mb-6">
+    <div class="alert alert-info" style="margin-bottom:0;"><div><strong>Offline mode:</strong> If you lose signal, the app saves locally. Submissions sync the moment you reconnect.</div></div>
+    <div class="alert alert-warning" style="margin-bottom:0;"><div><strong>Submission stuck?</strong> Use <a onclick="openTicketModal()">🎫 Raise manual ticket</a> to escalate to Ops with one click.</div></div>
+  </div>
 `;
+VIEW_INIT['agent-dashboard'] = ()=>{
+  window.openCase = function(id){ toast('Opening '+id+' · simulated for prototype'); };
+  window.openTicketModal = function(){
+    modal('Raise manual ticket', `
+      <p class="text-sm muted mb-3">Use this when the online submission isn't working — bad connection, KYC API down, or a customer disputing a decision.</p>
+      <div class="field"><label class="field-label">Case ID (optional)</label><input class="input" id="t_case" placeholder="e.g. CM-0482"></div>
+      <div class="field"><label class="field-label">Reason <span class="req">*</span></label>
+        <select class="select" id="t_reason">
+          <option>KYC API unavailable</option>
+          <option>Customer disputing auto-decline</option>
+          <option>Webhook stuck — Loan ID not issued</option>
+          <option>Biometric capture repeatedly failing</option>
+          <option>Document quality issue</option>
+          <option>Other (describe below)</option>
+        </select>
+      </div>
+      <div class="field"><label class="field-label">Description <span class="req">*</span></label><textarea class="textarea" id="t_desc" rows="3" placeholder="What happened? Add any context the Ops team will need."></textarea></div>
+      <div class="field"><label class="field-label">Priority</label>
+        <select class="select" id="t_pri"><option>Low</option><option selected>Medium</option><option>High · customer waiting</option></select>
+      </div>
+      <div class="flex justify-between items-center mt-3">
+        <span class="text-xs muted">Routes to Ops queue · SLA based on priority</span>
+        <div class="flex gap-2"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="submitTicket()">Submit ticket</button></div>
+      </div>
+    `);
+  };
+  window.submitTicket = function(){
+    const desc = document.getElementById('t_desc').value.trim();
+    if(!desc){ toast('Add a description before submitting','warn'); return; }
+    const id = 'TK-' + Math.floor(Math.random()*9000+1000);
+    closeModal();
+    toast('Ticket '+id+' raised · routed to Ops queue');
+  };
+};
 
 VIEWS['agent-lead'] = ()=>`
   <div class="view-header">
     <div><div class="crumb">Swap Agent · Step A1</div><h2 class="view-title">New lead</h2><div class="view-sub">Basic info before the full CX form · all fields validated in real time</div></div>
     <span class="badge badge-info">Auto-saved every 30s</span>
+  </div>
+
+  <div class="card mb-4" style="padding:14px 18px;">
+    <div class="flex items-center gap-3" style="flex-wrap:wrap;">
+      <span class="text-xs muted fw-600" style="text-transform:uppercase;letter-spacing:.04em;">Capture channel</span>
+      <div class="channel-toggle" id="channelToggle">
+        <a class="ch-opt active" data-ch="app" onclick="setChannel('app',this)">📱 Agent App</a>
+        <a class="ch-opt" data-ch="web" onclick="setChannel('web',this)">💻 Web form</a>
+        <a class="ch-opt" data-ch="ussd" onclick="setChannel('ussd',this)">☎️ USSD (*255#)</a>
+        <a class="ch-opt" data-ch="assist" onclick="setChannel('assist',this)">🤝 Agent-assisted phone</a>
+      </div>
+      <span class="text-xs muted" id="channelHint" style="margin-left:auto;">Default for in-branch capture</span>
+    </div>
   </div>
 
   <div class="card" id="leadForm">
@@ -617,7 +589,23 @@ VIEWS['agent-lead'] = ()=>`
     </form>
   </div>
 `;
-VIEW_INIT['agent-lead'] = ()=>attachValidation('leadForm');
+VIEW_INIT['agent-lead'] = ()=>{
+  attachValidation('leadForm');
+  const HINTS = {
+    app:    'Default for in-branch capture · full digital form + photo',
+    web:    'Browser fallback when the Agent App can\\'t be used',
+    ussd:   'Low-bandwidth · *255*1# collects basic info; biometric captured later at a swap station',
+    assist: 'Agent reads questions over phone · for riders without smartphones'
+  };
+  window.setChannel = function(ch, el){
+    document.querySelectorAll('.ch-opt').forEach(o=>o.classList.remove('active'));
+    el.classList.add('active');
+    document.getElementById('channelHint').textContent = HINTS[ch];
+    if(ch==='ussd'){
+      toast('USSD mode · simulating low-bandwidth flow','warn');
+    }
+  };
+};
 
 VIEWS['agent-cx'] = ()=>`
   <div class="view-header">
@@ -689,19 +677,89 @@ VIEWS['agent-cx'] = ()=>`
       <div class="flex justify-between items-center mt-4">
         <span class="text-xs muted">Form auto-saves every 30 seconds.</span>
         <div class="flex gap-2">
-          <button class="btn btn-secondary" onclick="event.preventDefault(); showView('agent-lead',document.querySelectorAll('.role-item')[1])">← Back</button>
-          <button class="btn btn-primary" data-submit onclick="event.preventDefault(); showView('agent-kyc',document.querySelectorAll('.role-item')[3]);">Submit & run KYC →</button>
+          <button class="btn btn-secondary" onclick="event.preventDefault(); showView('agent-lead',document.querySelectorAll('[data-role=agent] .role-item')[1])">← Back</button>
+          <button class="btn btn-primary" data-submit onclick="event.preventDefault(); showView('agent-kyc',document.querySelectorAll('[data-role=agent] .role-item')[3]);">Submit & run KYC →</button>
         </div>
       </div>
     </form>
+  </div>
+
+  <div class="card mt-6">
+    <div class="card-header">
+      <div>
+        <h4>📱 Mobile preview · what the agent sees on the Android app</h4>
+        <div class="text-xs muted">Same flow, optimised for low-end devices · for QA + design reference</div>
+      </div>
+      <span class="badge badge-info">Spiro Connect v1.4</span>
+    </div>
+
+    <div class="phone-grid">
+      <div class="phone-wrap"><div class="screen-label">Home</div>
+      <div class="phone-frame"><div class="phone-screen">
+        <div class="phone-statusbar"><span>09:24</span><span>● ●●● 100%</span></div>
+        <div class="phone-header"><div style="flex:1"><div class="phone-title">Spiro Connect</div><div class="text-xs muted">Kawempe · branch 04</div></div></div>
+        <div class="phone-body">
+          <div class="grid grid-2 gap-3 mb-3"><div class="kpi" style="padding:10px;"><div class="kpi-label" style="font-size:9px;">Leads</div><div class="kpi-value" style="font-size:18px;">7</div></div><div class="kpi" style="padding:10px;"><div class="kpi-label" style="font-size:9px;">Approved</div><div class="kpi-value" style="font-size:18px;color:var(--success);">5</div></div></div>
+          <div class="card" style="padding:10px;margin-bottom:6px;"><div class="flex justify-between items-center"><div><div class="text-sm fw-600">Patrick Okello</div><div class="text-xs muted">CM-0481</div></div><span class="badge badge-success">Approved</span></div></div>
+          <div class="card" style="padding:10px;margin-bottom:6px;"><div class="flex justify-between items-center"><div><div class="text-sm fw-600">Grace Nakato</div><div class="text-xs muted">CM-0480</div></div><span class="badge badge-warning">Under review</span></div></div>
+        </div>
+        <div class="phone-footer"><button class="btn btn-primary btn-block">+ New lead</button></div>
+      </div></div></div>
+
+      <div class="phone-wrap"><div class="screen-label">Liveness capture</div>
+      <div class="phone-frame"><div class="phone-screen">
+        <div class="phone-statusbar"><span>09:27</span><span>● ●●● 100%</span></div>
+        <div class="phone-header"><div class="phone-title">Liveness check</div></div>
+        <div class="phone-body" style="background:#1A1F1C;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+          <div style="width:160px;height:200px;border-radius:50% / 40%;border:3px dashed var(--spiro-green);display:flex;align-items:center;justify-content:center;margin-bottom:20px;background:rgba(0,135,90,0.15);"><div style="font-size:50px;">👤</div></div>
+          <div style="color:#fff;font-family:'Poppins';font-weight:600;font-size:14px;margin-bottom:4px;">Blink twice slowly</div>
+          <div style="color:rgba(255,255,255,0.6);font-size:12px;text-align:center;margin-bottom:16px;">Passive liveness · no prompts</div>
+          <div style="background:rgba(255,255,255,0.1);padding:6px 12px;border-radius:999px;font-size:11px;"><span style="color:var(--success);">●</span> 0.92 / 0.75 · injection check ✓</div>
+        </div>
+        <div class="phone-footer" style="background:#1A1F1C;border-top-color:rgba(255,255,255,0.1);"><button class="btn btn-primary btn-block">Capture</button></div>
+      </div></div></div>
+
+      <div class="phone-wrap"><div class="screen-label">Approved</div>
+      <div class="phone-frame"><div class="phone-screen">
+        <div class="phone-statusbar"><span>09:29</span><span>● ●●● 100%</span></div>
+        <div class="phone-header"><div class="phone-title">Approved</div></div>
+        <div class="phone-body">
+          <div class="text-center" style="padding:14px 0;">
+            <div style="width:70px;height:70px;margin:0 auto 16px;border-radius:50%;background:var(--success-bg);display:flex;align-items:center;justify-content:center;font-size:32px;">✓</div>
+            <h4>Approved!</h4>
+            <div class="text-xs muted">28 seconds end-to-end</div>
+          </div>
+          <div class="card" style="background:var(--spiro-green-light);border:none;padding:14px;">
+            <div class="text-xs fw-600" style="text-transform:uppercase;color:var(--spiro-green-dark);">Loan ID</div>
+            <div style="font-family:'Poppins';font-weight:700;font-size:20px;color:var(--spiro-green-dark);">UN-2026-04812</div>
+          </div>
+          <div class="text-xs muted mt-3"><strong>UGX 280,000</strong> downpayment due · pay via USSD or app</div>
+        </div>
+      </div></div></div>
+    </div>
   </div>
 `;
 VIEW_INIT['agent-cx'] = ()=>attachValidation('cxForm');
 
 VIEWS['agent-kyc'] = ()=>`
   <div class="view-header">
-    <div><div class="crumb">Swap Agent · Step C3</div><h2 class="view-title">KYC verification</h2><div class="view-sub">Real-time checks against NIRA, biometric matcher, and duplicate scan · p95 ≤ 5s</div></div>
-    <span class="badge badge-success">Live</span>
+    <div><div class="crumb">Swap Agent · Step C3 → D4</div><h2 class="view-title">KYC verification + risk assessment</h2><div class="view-sub">Real-time checks against NIRA, biometric matcher, duplicate scan, then ML risk score · p95 ≤ 5s</div></div>
+    <button class="btn btn-primary btn-sm" onclick="runKycSim()">▶ Run simulation again</button>
+  </div>
+
+  <div class="card mb-4" id="kycProgressCard">
+    <div class="flex justify-between items-center mb-3">
+      <h4>Live verification</h4>
+      <span class="text-xs muted" id="kycElapsed">0.0s elapsed</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="kycProgress" style="width:0%"></div></div>
+    <ul class="timeline mt-4" id="kycSteps">
+      <li class="timeline-item" data-k="nin"><div class="timeline-dot" id="dot-nin">·</div><div><div class="timeline-title">NIN verification · NIRA</div><div class="timeline-meta" id="meta-nin">Queued</div></div></li>
+      <li class="timeline-item" data-k="bio"><div class="timeline-dot" id="dot-bio">·</div><div><div class="timeline-title">Biometric + passive liveness</div><div class="timeline-meta" id="meta-bio">Queued</div></div></li>
+      <li class="timeline-item" data-k="doc"><div class="timeline-dot" id="dot-doc">·</div><div><div class="timeline-title">Driving permit + guarantor docs</div><div class="timeline-meta" id="meta-doc">Queued</div></div></li>
+      <li class="timeline-item" data-k="dup"><div class="timeline-dot" id="dot-dup">·</div><div><div class="timeline-title">Duplicate check (NIN + phone + device)</div><div class="timeline-meta" id="meta-dup">Queued</div></div></li>
+      <li class="timeline-item" data-k="ml"><div class="timeline-dot" id="dot-ml">·</div><div><div class="timeline-title">AI risk score (ML model v1.4)</div><div class="timeline-meta" id="meta-ml">Queued</div></div></li>
+    </ul>
   </div>
 
   <div class="tabs">
@@ -779,29 +837,97 @@ VIEW_INIT['agent-kyc'] = ()=>{
     el.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
     el.classList.add('active');
   };
+  window.runKycSim = function(){
+    const steps = [
+      {k:'nin', label:'NIN verified · 1.2s · NIRA match', pct:25, dur:1200},
+      {k:'bio', label:'Score 0.91 · liveness 0.92 · injection check ✓', pct:50, dur:900},
+      {k:'doc', label:'Permit + guarantor ID valid · expiry 2029', pct:70, dur:700},
+      {k:'dup', label:'No active duplicates · checked 4,812 records', pct:85, dur:600},
+      {k:'ml',  label:'Risk score 22 / 100 · band Auto-approve (0–30)', pct:100, dur:900}
+    ];
+    // Reset
+    document.querySelectorAll('#kycSteps .timeline-dot').forEach(d=>{ d.className='timeline-dot'; d.textContent='·'; });
+    document.querySelectorAll('#kycSteps .timeline-meta').forEach(m=>m.textContent='Queued');
+    const pf = document.getElementById('kycProgress');
+    pf.style.width='0%'; pf.classList.add('indeterminate');
+    const t0 = Date.now();
+    const el = document.getElementById('kycElapsed');
+    const tick = setInterval(()=>{ if(el) el.textContent = ((Date.now()-t0)/1000).toFixed(1)+'s elapsed'; }, 100);
+
+    let idx = 0;
+    function next(){
+      if(idx>0){
+        const prev = steps[idx-1];
+        const d = document.getElementById('dot-'+prev.k); d.className='timeline-dot done'; d.textContent='✓';
+        document.getElementById('meta-'+prev.k).textContent = prev.label;
+      }
+      if(idx>=steps.length){
+        pf.classList.remove('indeterminate'); pf.style.width='100%';
+        clearInterval(tick);
+        toast('KYC + risk complete · auto-approved · Loan ID issued','');
+        return;
+      }
+      const s = steps[idx];
+      const cd = document.getElementById('dot-'+s.k); cd.className='timeline-dot active'; cd.textContent='●';
+      document.getElementById('meta-'+s.k).innerHTML = '<span class="spinner"></span> Running…';
+      pf.classList.remove('indeterminate');
+      pf.style.width = s.pct+'%';
+      idx++;
+      setTimeout(next, s.dur);
+    }
+    next();
+  };
+  // Auto-run on view open
+  setTimeout(()=>{ if(document.getElementById('kycProgress')) runKycSim(); }, 250);
 };
 
 VIEWS['agent-applications'] = ()=>`
   <div class="view-header">
     <div><div class="crumb">Swap Agent</div><h2 class="view-title">My applications</h2><div class="view-sub">All leads you've submitted · live status from Spiro DB</div></div>
-    <div class="flex gap-2"><select class="select" style="font-size:12px;padding:6px 10px;"><option>All statuses</option><option>Approved</option><option>Under review</option><option>Declined</option></select></div>
+    <div class="flex gap-2">
+      <input class="input" id="appSearch" placeholder="Search by case ID or customer" style="font-size:12px;padding:6px 10px;width:240px;" oninput="filterApps()">
+      <select class="select" id="appFilter" style="font-size:12px;padding:6px 10px;" onchange="filterApps()">
+        <option value="all">All statuses</option>
+        <option value="approved">Approved</option>
+        <option value="review">Under review</option>
+        <option value="declined">Declined</option>
+        <option value="refer">KYC Refer</option>
+        <option value="stalled">Webhook stalled</option>
+      </select>
+    </div>
   </div>
 
   <div class="card" style="padding:0;">
     <table class="table">
-      <thead><tr><th>Case ID</th><th>Customer</th><th>Phone</th><th>Submitted</th><th>Risk score</th><th>Status</th></tr></thead>
-      <tbody>
-        <tr><td><span class="case-id">CM-0482</span></td><td>Sarah Namuli</td><td>+256 772 481 902</td><td>Today · 09:28</td><td>22</td><td><span class="badge badge-success">Approved</span></td></tr>
-        <tr><td><span class="case-id">CM-0481</span></td><td>Patrick Okello</td><td>+256 752 118 044</td><td>Today · 09:12</td><td>18</td><td><span class="badge badge-success">Approved</span></td></tr>
-        <tr><td><span class="case-id">CM-0480</span></td><td>Grace Nakato</td><td>+256 778 660 215</td><td>Today · 08:50</td><td>—</td><td><span class="badge badge-warning">Under review</span></td></tr>
-        <tr><td><span class="case-id">CM-0479</span></td><td>Moses Kintu</td><td>+256 751 902 887</td><td>Today · 08:18</td><td>74</td><td><span class="badge badge-danger">Declined</span></td></tr>
-        <tr><td><span class="case-id">CM-0478</span></td><td>Brian Ssempa</td><td>+256 772 411 098</td><td>Today · 07:52</td><td>28</td><td><span class="badge badge-warning">Webhook stalled</span></td></tr>
-        <tr><td><span class="case-id">CM-0476</span></td><td>Annet Asiimwe</td><td>+256 779 332 110</td><td>Yest · 17:04</td><td>34</td><td><span class="badge badge-success">Approved</span></td></tr>
-        <tr><td><span class="case-id">CM-0473</span></td><td>Peter Lubega</td><td>+256 753 088 222</td><td>Yest · 14:18</td><td>—</td><td><span class="badge badge-info">KYC Refer</span></td></tr>
+      <thead><tr><th>Case ID</th><th>Customer</th><th>Phone</th><th>Submitted</th><th>Risk score</th><th>Status</th><th></th></tr></thead>
+      <tbody id="appRows">
+        <tr data-status="approved" data-q="cm-0482 sarah namuli"><td><span class="case-id">CM-0482</span></td><td>Sarah Namuli</td><td>+256 772 481 902</td><td>Today · 09:28</td><td>22</td><td><span class="badge badge-success">Approved</span></td><td><a onclick="openCase('CM-0482')">Open →</a></td></tr>
+        <tr data-status="approved" data-q="cm-0481 patrick okello"><td><span class="case-id">CM-0481</span></td><td>Patrick Okello</td><td>+256 752 118 044</td><td>Today · 09:12</td><td>18</td><td><span class="badge badge-success">Approved</span></td><td><a onclick="openCase('CM-0481')">Open →</a></td></tr>
+        <tr data-status="review" data-q="cm-0480 grace nakato"><td><span class="case-id">CM-0480</span></td><td>Grace Nakato</td><td>+256 778 660 215</td><td>Today · 08:50</td><td>—</td><td><span class="badge badge-warning">Under review</span></td><td><a onclick="openCase('CM-0480')">Open →</a></td></tr>
+        <tr data-status="declined" data-q="cm-0479 moses kintu"><td><span class="case-id">CM-0479</span></td><td>Moses Kintu</td><td>+256 751 902 887</td><td>Today · 08:18</td><td>74</td><td><span class="badge badge-danger">Declined</span></td><td><a onclick="openCase('CM-0479')">Open →</a></td></tr>
+        <tr data-status="stalled" data-q="cm-0478 brian ssempa"><td><span class="case-id">CM-0478</span></td><td>Brian Ssempa</td><td>+256 772 411 098</td><td>Today · 07:52</td><td>28</td><td><span class="badge badge-warning">Webhook stalled</span></td><td><a onclick="openCase('CM-0478')">Open →</a></td></tr>
+        <tr data-status="approved" data-q="cm-0476 annet asiimwe"><td><span class="case-id">CM-0476</span></td><td>Annet Asiimwe</td><td>+256 779 332 110</td><td>Yest · 17:04</td><td>34</td><td><span class="badge badge-success">Approved</span></td><td><a onclick="openCase('CM-0476')">Open →</a></td></tr>
+        <tr data-status="refer" data-q="cm-0473 peter lubega"><td><span class="case-id">CM-0473</span></td><td>Peter Lubega</td><td>+256 753 088 222</td><td>Yest · 14:18</td><td>—</td><td><span class="badge badge-info">KYC Refer</span></td><td><a onclick="openCase('CM-0473')">Open →</a></td></tr>
       </tbody>
     </table>
+    <div id="appEmpty" style="display:none;padding:24px;text-align:center;color:var(--text-muted);font-size:13px;">No applications match the current filter.</div>
   </div>
 `;
+VIEW_INIT['agent-applications'] = ()=>{
+  window.filterApps = function(){
+    const f = document.getElementById('appFilter').value;
+    const q = (document.getElementById('appSearch').value||'').toLowerCase().trim();
+    let shown = 0;
+    document.querySelectorAll('#appRows tr').forEach(tr=>{
+      const okStatus = (f==='all' || tr.dataset.status===f);
+      const okQuery  = (!q || tr.dataset.q.includes(q));
+      tr.style.display = (okStatus && okQuery) ? '' : 'none';
+      if(okStatus && okQuery) shown++;
+    });
+    document.getElementById('appEmpty').style.display = shown===0 ? 'block' : 'none';
+  };
+  window.openCase = function(id){ toast('Opening '+id+' · simulated for prototype'); };
+};
 
 /* ================ OPS VIEWS ================ */
 VIEWS['ops-queue'] = ()=>`
@@ -1290,6 +1416,380 @@ VIEWS['agent-mobile'] = ()=>`
 
   </div>
 `;
+
+/* ================ NEW AGENT VIEWS ================ */
+VIEWS['agent-tickets'] = ()=>`
+  <div class="view-header">
+    <div><div class="crumb">Swap Agent</div><h2 class="view-title">Manual tickets</h2><div class="view-sub">Escalations you've raised when online submission wasn't possible</div></div>
+    <button class="btn btn-primary" onclick="openTicketModal()">+ Raise ticket</button>
+  </div>
+
+  <div class="grid grid-4 mb-4">
+    <div class="kpi"><div class="kpi-label">Open</div><div class="kpi-value">3</div><div class="kpi-delta">Assigned to Ops</div></div>
+    <div class="kpi"><div class="kpi-label">Resolved · 7d</div><div class="kpi-value" style="color:var(--success);">12</div><div class="kpi-delta">Avg. 1h 22m</div></div>
+    <div class="kpi"><div class="kpi-label">Awaiting your reply</div><div class="kpi-value" style="color:var(--warning);">1</div><div class="kpi-delta">Action needed</div></div>
+    <div class="kpi"><div class="kpi-label">Escalated</div><div class="kpi-value">0</div><div class="kpi-delta">Last 30 days</div></div>
+  </div>
+
+  <div class="card" style="padding:0;">
+    <table class="table">
+      <thead><tr><th>Ticket</th><th>Reason</th><th>Case</th><th>Priority</th><th>Opened</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        <tr><td><span class="case-id">TK-3014</span></td><td>KYC API unavailable</td><td>CM-0485</td><td><span class="badge badge-warning">Medium</span></td><td>11:02</td><td><span class="badge badge-info">With Ops</span></td><td><a onclick="openCase('TK-3014')">Open →</a></td></tr>
+        <tr><td><span class="case-id">TK-3009</span></td><td>Webhook stuck — Loan ID not issued</td><td>CM-0478</td><td><span class="badge badge-danger">High</span></td><td>07:58</td><td><span class="badge badge-warning">Awaiting your reply</span></td><td><a onclick="openCase('TK-3009')">Open →</a></td></tr>
+        <tr><td><span class="case-id">TK-2998</span></td><td>Customer disputing auto-decline</td><td>CM-0461</td><td><span class="badge badge-warning">Medium</span></td><td>Yest 16:21</td><td><span class="badge badge-info">With Ops</span></td><td><a onclick="openCase('TK-2998')">Open →</a></td></tr>
+        <tr><td><span class="case-id">TK-2961</span></td><td>Document quality issue</td><td>CM-0419</td><td><span class="badge">Low</span></td><td>3 days ago</td><td><span class="badge badge-success">Resolved</span></td><td><a onclick="openCase('TK-2961')">Open →</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="alert alert-info mt-4"><div><strong>When to raise a ticket:</strong> KYC API down, biometric won't capture, webhook stuck, customer dispute, or any blocker that prevents normal flow. Routed to Ops queue with priority-based SLA.</div></div>
+`;
+VIEW_INIT['agent-tickets'] = ()=>{
+  window.openTicketModal = window.openTicketModal || function(){ toast('Open the Dashboard first to access ticket form','warn'); };
+  window.openCase = window.openCase || function(id){ toast('Opening '+id); };
+};
+
+VIEWS['agent-passport'] = ()=>`
+  <div class="view-header">
+    <div><div class="crumb">Swap Agent ✨</div><h2 class="view-title">Rider Passport <span class="badge badge-info">Inspired by Sumsub · Reusable KYC</span></h2><div class="view-sub">Re-verify a rider already onboarded by another Spiro financier partner · skips re-capture if consent is given</div></div>
+    <button class="btn btn-primary" onclick="lookupPassport()">🔍 Lookup by NIN</button>
+  </div>
+
+  <div class="card mb-4">
+    <h4 class="mb-3">Find an existing rider</h4>
+    <div class="form-grid">
+      <div class="field"><label class="field-label">National ID (NIN)</label><input class="input" id="pp_nin" value="CM85101410ABCD" style="text-transform:uppercase"></div>
+      <div class="field"><label class="field-label">Or phone number</label><input class="input" id="pp_phone" placeholder="+256 7XX XXX XXX"></div>
+    </div>
+    <button class="btn btn-primary" onclick="lookupPassport()">Search Spiro network</button>
+  </div>
+
+  <div class="card" id="passportResult" style="display:none;">
+    <div class="flex justify-between items-center mb-3">
+      <div>
+        <h4>Sarah Namuli · Passport found</h4>
+        <div class="text-xs muted">Last verified by Watu Credit · 8 months ago · NIN + biometric + permit</div>
+      </div>
+      <span class="badge badge-success">Reusable</span>
+    </div>
+
+    <div class="grid grid-3 gap-3 mb-3">
+      <div class="kpi" style="padding:14px;"><div class="kpi-label" style="font-size:10px;">KYC freshness</div><div class="kpi-value" style="font-size:20px;color:var(--success);">8 mo</div><div class="text-xs muted">Within 12-mo policy</div></div>
+      <div class="kpi" style="padding:14px;"><div class="kpi-label" style="font-size:10px;">Loans on Spiro network</div><div class="kpi-value" style="font-size:20px;">2</div><div class="text-xs muted">Both repaid in full</div></div>
+      <div class="kpi" style="padding:14px;"><div class="kpi-label" style="font-size:10px;">Trust score</div><div class="kpi-value" style="font-size:20px;color:var(--success);">A+</div><div class="text-xs muted">Top 8%</div></div>
+    </div>
+
+    <div class="alert alert-warning"><div class="text-sm"><strong>Consent required.</strong> The rider must consent to share their KYC passport with Union MFI Uganda. SMS prompt sent to <strong>+256 772 481 902</strong> · awaiting response.</div></div>
+
+    <h5 class="mt-4 mb-2">Verified attributes (from Watu's record)</h5>
+    <table class="table table-compact">
+      <tbody>
+        <tr><td>NIN · NIRA</td><td><span class="badge badge-success">Verified · 2025-09-11</span></td></tr>
+        <tr><td>Biometric (face)</td><td><span class="badge badge-success">0.94 · valid (re-capture if >12 mo)</span></td></tr>
+        <tr><td>Driving permit</td><td><span class="badge badge-success">UG842617 · expires 2029-03</span></td></tr>
+        <tr><td>Address</td><td><span class="badge badge-warning">Stale · re-confirm</span></td></tr>
+      </tbody>
+    </table>
+
+    <div class="flex gap-2 mt-4">
+      <button class="btn btn-primary" onclick="toast('Passport accepted · skipping to risk score','')">Accept passport · skip KYC</button>
+      <button class="btn btn-secondary" onclick="toast('Refreshing partial fields only','warn')">Refresh stale fields only</button>
+      <button class="btn btn-ghost" onclick="toast('Falling back to full re-verification','warn')">Full re-verify</button>
+    </div>
+  </div>
+
+  <div class="card mt-4" id="passportEmpty">
+    <p class="text-sm muted">No passport found yet. Use NIN or phone lookup above to search the Spiro financier network for an existing verification. <strong>Why this matters:</strong> riders churn between unions — re-verifying from scratch wastes time and raises CAC. A consented Rider Passport shortens onboarding from minutes to seconds.</p>
+  </div>
+`;
+VIEW_INIT['agent-passport'] = ()=>{
+  window.lookupPassport = function(){
+    const nin = (document.getElementById('pp_nin').value||'').trim().toUpperCase();
+    if(!nin){ toast('Enter a NIN to search','warn'); return; }
+    document.getElementById('passportResult').style.display='block';
+    document.getElementById('passportEmpty').style.display='none';
+    toast('Match found in Watu Credit · 8-month-old passport');
+  };
+};
+
+/* ================ NEW OPS VIEWS ================ */
+VIEWS['ops-api'] = ()=>`
+  <div class="view-header">
+    <div><div class="crumb">Spiro Ops ✨</div><h2 class="view-title">API health check</h2><div class="view-sub">Live status, latency, and error rate of every external + internal API in the KYC pipeline</div></div>
+    <div class="flex gap-2 items-center"><span class="pulse-dot"></span> <span class="text-xs muted">Live · refresh every 30s</span></div>
+  </div>
+
+  <div class="grid grid-4 mb-4">
+    <div class="kpi"><div class="kpi-label">Healthy</div><div class="kpi-value" style="color:var(--success);">6 / 8</div><div class="kpi-delta up">Steady</div></div>
+    <div class="kpi"><div class="kpi-label">Degraded</div><div class="kpi-value" style="color:var(--warning);">1</div><div class="kpi-delta down">Adara · since 09:14</div></div>
+    <div class="kpi"><div class="kpi-label">Down</div><div class="kpi-value" style="color:var(--danger);">1</div><div class="kpi-delta down">Document OCR (failover)</div></div>
+    <div class="kpi"><div class="kpi-label">Avg. p95 latency</div><div class="kpi-value">2.4s</div><div class="kpi-delta up">Within NFR ≤5s</div></div>
+  </div>
+
+  <div class="grid grid-2 gap-4 mb-4">
+    ${apiCard('NIRA / NIN check','Smile ID',99.7,1.2,'good')}
+    ${apiCard('Biometric matcher','Smile ID',99.4,1.8,'good')}
+    ${apiCard('Document OCR','Onfido (failover)',0,0,'down')}
+    ${apiCard('Adara webhook (Union)','Union UG',96.1,2.1,'warn')}
+    ${apiCard('ML risk model','Spiro internal',100,0.9,'good')}
+    ${apiCard('Spiro DB write','Spiro internal',100,0.06,'good')}
+    ${apiCard('SMS gateway','Africa\\'s Talking',99.9,0.4,'good')}
+    ${apiCard('USSD gateway','Africa\\'s Talking',99.2,0.7,'good')}
+  </div>
+
+  <div class="card">
+    <div class="card-header"><h4>Latency over the last 6 hours</h4><span class="badge badge-info">p95 in seconds</span></div>
+    <div style="display:flex;align-items:flex-end;gap:6px;height:140px;padding:8px 0;border-bottom:1px solid var(--border);">
+      ${sparkBars([1.2,1.4,1.1,1.3,1.2,2.1,2.4,2.2,3.1,4.8,3.7,2.9,2.4,2.6,2.3,1.9,2.1,2.5,2.7,2.4,2.2,2.0,1.9,2.1])}
+    </div>
+    <div class="flex justify-between text-xs muted mt-2"><span>6h ago</span><span>now</span></div>
+  </div>
+`;
+function apiCard(name, provider, uptime, latency, state){
+  const color = state==='good' ? 'var(--success)' : (state==='warn' ? 'var(--warning)' : 'var(--danger)');
+  const label = state==='good' ? 'Healthy' : (state==='warn' ? 'Degraded' : 'Down');
+  const bg = state==='good' ? 'var(--success-bg)' : (state==='warn' ? 'var(--warning-bg)' : 'var(--danger-bg)');
+  return `<div class="card" style="padding:14px;">
+    <div class="flex justify-between items-center mb-2">
+      <div><div class="text-sm fw-600">${name}</div><div class="text-xs muted">${provider}</div></div>
+      <span class="badge" style="background:${bg};color:${color};">${state==='good'?'●':state==='warn'?'⚠':'✕'} ${label}</span>
+    </div>
+    <div class="grid grid-2 gap-2 mt-2">
+      <div><div class="text-xs muted">Uptime 24h</div><div class="text-sm fw-600">${uptime}%</div></div>
+      <div><div class="text-xs muted">p95 latency</div><div class="text-sm fw-600">${latency}s</div></div>
+    </div>
+    <div class="progress-track" style="margin-top:8px;"><div class="progress-fill" style="width:${uptime}%;background:${color};"></div></div>
+  </div>`;
+}
+function sparkBars(values){
+  const max = Math.max(...values);
+  return values.map(v=>{
+    const h = (v/max)*100;
+    const c = v>4 ? 'var(--danger)' : (v>3 ? 'var(--warning)' : 'var(--spiro-green)');
+    return `<div title="${v}s" style="flex:1;height:${h}%;background:${c};border-radius:2px 2px 0 0;min-width:8px;"></div>`;
+  }).join('');
+}
+
+VIEWS['ops-connections'] = ()=>`
+  <div class="view-header">
+    <div><div class="crumb">Spiro Ops ✨</div><h2 class="view-title">Connections graph <span class="badge badge-info">Inspired by Persona</span></h2><div class="view-sub">Shows when multiple applicants share phones, devices, addresses, or guarantors — catches fraud rings before disbursement</div></div>
+    <select class="select" style="font-size:12px;padding:6px 10px;" onchange="toast('Switched to '+this.value+' applicant','')"><option>CM-0482 · Sarah Namuli</option><option>CM-0480 · Grace Nakato</option><option>CM-0479 · Moses Kintu</option></select>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><h4>4 connections detected</h4><span class="badge badge-warning">Review before approval</span></div>
+    <div style="position:relative;height:380px;background:linear-gradient(180deg,var(--bg) 0%,var(--surface) 100%);border:1px solid var(--border);border-radius:8px;overflow:hidden;">
+      <svg width="100%" height="100%" viewBox="0 0 800 380" style="position:absolute;inset:0;">
+        <line x1="400" y1="190" x2="200" y2="80"  stroke="#EF4444" stroke-width="2" stroke-dasharray="4 4" />
+        <line x1="400" y1="190" x2="600" y2="80"  stroke="#F59E0B" stroke-width="2" stroke-dasharray="4 4" />
+        <line x1="400" y1="190" x2="180" y2="300" stroke="#EF4444" stroke-width="2" stroke-dasharray="4 4" />
+        <line x1="400" y1="190" x2="620" y2="300" stroke="#10B981" stroke-width="2" />
+        <text x="290" y="130" font-size="10" fill="#EF4444" font-weight="600">Same device</text>
+        <text x="500" y="130" font-size="10" fill="#F59E0B" font-weight="600">Same address</text>
+        <text x="270" y="255" font-size="10" fill="#EF4444" font-weight="600">Same phone</text>
+        <text x="500" y="255" font-size="10" fill="#10B981" font-weight="600">Same guarantor</text>
+      </svg>
+      <div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);background:var(--spiro-green);color:#fff;padding:14px 18px;border-radius:50%;font-weight:700;font-family:'Poppins';box-shadow:var(--shadow-lg);text-align:center;">
+        <div style="font-size:11px;opacity:.85;">CURRENT</div>
+        <div style="font-size:13px;">Sarah Namuli</div>
+        <div style="font-size:10px;opacity:.85;">CM-0482</div>
+      </div>
+      <div style="position:absolute;left:25%;top:20%;background:#fff;border:2px solid var(--danger);padding:8px 12px;border-radius:8px;text-align:center;box-shadow:var(--shadow);"><div class="text-xs fw-600">CM-0479</div><div class="text-xs muted">Moses Kintu</div><div class="text-xs" style="color:var(--danger);">Declined</div></div>
+      <div style="position:absolute;left:75%;top:20%;background:#fff;border:2px solid var(--warning);padding:8px 12px;border-radius:8px;text-align:center;box-shadow:var(--shadow);"><div class="text-xs fw-600">CM-0461</div><div class="text-xs muted">L. Onyango</div><div class="text-xs" style="color:var(--warning);">Review</div></div>
+      <div style="position:absolute;left:22%;top:78%;background:#fff;border:2px solid var(--danger);padding:8px 12px;border-radius:8px;text-align:center;box-shadow:var(--shadow);"><div class="text-xs fw-600">CM-0418</div><div class="text-xs muted">B. Mukasa</div><div class="text-xs" style="color:var(--danger);">Declined</div></div>
+      <div style="position:absolute;left:78%;top:78%;background:#fff;border:2px solid var(--success);padding:8px 12px;border-radius:8px;text-align:center;box-shadow:var(--shadow);"><div class="text-xs fw-600">CM-0481</div><div class="text-xs muted">P. Okello</div><div class="text-xs" style="color:var(--success);">Approved</div></div>
+    </div>
+  </div>
+
+  <div class="card mt-4">
+    <h4 class="mb-3">Why this matters</h4>
+    <p class="text-sm muted">Boda-boda fraud rings often share assets: one phone enrolling multiple "riders", one guarantor recycling across union members, or a swap-station agent enrolling ghost riders. Surfacing these links before the $1000 EV ships is the cheapest fraud control we have. <strong>Recommended action:</strong> route this case to manual review even though the score is in Auto-approve band.</p>
+    <div class="flex gap-2 mt-3"><button class="btn btn-primary" onclick="toast('Routed to manual review','warn')">Route to manual review</button><button class="btn btn-secondary" onclick="toast('Dismissed signal','')">Dismiss (low confidence)</button></div>
+  </div>
+`;
+
+VIEWS['ops-device'] = ()=>`
+  <div class="view-header">
+    <div><div class="crumb">Spiro Ops ✨</div><h2 class="view-title">Device & Velocity signals <span class="badge badge-info">Inspired by Jumio</span></h2><div class="view-sub">Device fingerprint, SIM age, geo-velocity, and application-count signals · feed the risk score</div></div>
+    <select class="select" style="font-size:12px;padding:6px 10px;"><option>CM-0482 · Sarah Namuli</option></select>
+  </div>
+
+  <div class="grid grid-2 gap-4 mb-4">
+    <div class="card">
+      <h4 class="mb-3">Device fingerprint</h4>
+      <table class="table table-compact">
+        <tbody>
+          <tr><td>IMEI</td><td><span class="case-id">358XXXXXXX2114</span></td></tr>
+          <tr><td>Model · OS</td><td>Tecno Spark 10 · Android 13</td></tr>
+          <tr><td>First seen</td><td>2025-09-11 · with Watu Credit</td></tr>
+          <tr><td>Applications from this IMEI</td><td><span class="badge badge-warning">2 in last 30 days</span></td></tr>
+          <tr><td>Rooted / emulator</td><td><span class="badge badge-success">No</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h4 class="mb-3">SIM + carrier</h4>
+      <table class="table table-compact">
+        <tbody>
+          <tr><td>SIM age</td><td><span class="badge badge-success">14 months</span></td></tr>
+          <tr><td>Carrier</td><td>MTN Uganda</td></tr>
+          <tr><td>Recent port-in</td><td><span class="badge badge-success">No</span></td></tr>
+          <tr><td>Roaming</td><td>No</td></tr>
+          <tr><td>SIM swap (last 90d)</td><td><span class="badge badge-success">None detected</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h4 class="mb-3">Geo-velocity</h4>
+      <table class="table table-compact">
+        <tbody>
+          <tr><td>Application location</td><td>Kawempe · -0.36, 32.56</td></tr>
+          <tr><td>Last seen on Spiro network</td><td>Kawempe · 3 days ago</td></tr>
+          <tr><td>Impossible-travel flags</td><td><span class="badge badge-success">None</span></td></tr>
+          <tr><td>IP geolocation match</td><td><span class="badge badge-success">Match · Uganda</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <h4 class="mb-3">Velocity counters</h4>
+      <table class="table table-compact">
+        <tbody>
+          <tr><td>Apps from same NIN (90d)</td><td>1 · this one</td></tr>
+          <tr><td>Apps from same phone (90d)</td><td><span class="badge badge-success">1</span></td></tr>
+          <tr><td>Apps from same device (30d)</td><td><span class="badge badge-warning">2</span></td></tr>
+          <tr><td>Apps from same address (30d)</td><td>1</td></tr>
+          <tr><td>Apps from same guarantor (90d)</td><td><span class="badge badge-success">1</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="alert alert-warning"><div class="text-sm"><strong>1 yellow flag:</strong> 2 applications from the same IMEI in 30 days. Compare with the <a onclick="showView('ops-connections', document.querySelectorAll('[data-role=ops] .role-item')[2])">Connections graph</a> before approving.</div></div>
+`;
+
+/* ================ NEW FINANCIER VIEW ================ */
+VIEWS['fin-journey'] = ()=>`
+  <div class="view-header">
+    <div><div class="crumb">Financier Admin ✨</div><h2 class="view-title">Journey builder <span class="badge badge-info">Inspired by Onfido Studio</span></h2><div class="view-sub">Drag-and-drop the steps a customer goes through · per-financier · no code deploy</div></div>
+    <div class="flex gap-2"><button class="btn btn-secondary btn-sm" onclick="toast('Reset to default flow','warn')">Reset to default</button><button class="btn btn-primary btn-sm" onclick="toast('Journey saved · v2 published','')">Publish journey</button></div>
+  </div>
+
+  <div class="alert alert-info"><div><strong>Why this matters:</strong> different MFIs have different risk appetites. Watu may need extra docs for loans >$1200, while a SACCO may want a guarantor video. Letting financiers self-serve their own journey is the white-label superpower.</div></div>
+
+  <div class="grid" style="grid-template-columns:1fr 280px;gap:20px;">
+    <div class="card">
+      <h4 class="mb-3">Active journey · Union MFI Uganda · v1.4</h4>
+      <div id="journeyCanvas" style="display:flex;flex-direction:column;gap:8px;">
+        ${journeyStep(1,'Lead capture · 4 fields','required','Always on · platform-wide')}
+        ${journeyStep(2,'CX data form · 23 fields','required','Financier can suppress non-mandatory')}
+        ${journeyStep(3,'NIN verification · NIRA','required','Toggle Off only for non-UG markets')}
+        ${journeyStep(4,'Biometric + liveness','required','Threshold 0.78 (current setting)')}
+        ${journeyStep(5,'Document upload (permit + guarantor ID)','required','3 docs · configurable')}
+        ${journeyStep(6,'Guarantor selfie','conditional','Only when loan > UGX 4.5M')}
+        ${journeyStep(7,'AI risk score','required','ML v1.4')}
+        ${journeyStep(8,'Credit decision','required','Auto-approve / Review / Decline')}
+        ${journeyStep(9,'Loan ID creation','required','Webhook → Adara')}
+        ${journeyStep(10,'CX notification','required','SMS + in-app')}
+      </div>
+    </div>
+
+    <div class="card">
+      <h4 class="mb-3">Available steps</h4>
+      <div class="flex flex-col gap-2">
+        ${addStep('Address proof upload','Optional doc capture')}
+        ${addStep('Video selfie','30s · stronger anti-spoof')}
+        ${addStep('Bank statement','Pulled via Plaid or open banking')}
+        ${addStep('Family verification call','Manual CX call · for high-tier loans')}
+        ${addStep('Co-applicant guarantor','Second NIN + photo')}
+      </div>
+      <div class="alert alert-success mt-3"><div class="text-xs">Drag any step into the active journey · changes are version-stamped and require Maker/Checker.</div></div>
+    </div>
+  </div>
+`;
+function journeyStep(n, label, kind, sub){
+  const color = kind==='required' ? 'var(--spiro-green)' : (kind==='conditional' ? 'var(--warning)' : 'var(--text-faint)');
+  const chip  = kind==='required' ? 'Required' : (kind==='conditional' ? 'Conditional' : 'Optional');
+  return `<div style="display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--border);border-left:4px solid ${color};border-radius:8px;background:var(--surface);cursor:grab;" onmouseover="this.style.boxShadow='var(--shadow)'" onmouseout="this.style.boxShadow=''"><div style="font-family:'Poppins';font-weight:700;color:var(--text-muted);width:24px;text-align:center;">${n}</div><div style="flex:1;"><div class="text-sm fw-600">${label}</div><div class="text-xs muted">${sub}</div></div><span class="badge" style="color:${color};background:${kind==='required'?'var(--spiro-green-light)':kind==='conditional'?'var(--warning-bg)':'var(--bg)'};">${chip}</span><span style="color:var(--text-faint);cursor:grab;">⋮⋮</span></div>`;
+}
+function addStep(label, sub){
+  return `<div style="padding:10px;border:1px dashed var(--border);border-radius:8px;cursor:grab;" onclick="toast('Drag '+`${label}`+' into the journey','')"><div class="text-sm fw-600">+ ${label}</div><div class="text-xs muted">${sub}</div></div>`;
+}
+
+/* ================ NEW COMPLIANCE VIEW ================ */
+VIEWS['comp-policies'] = ()=>`
+  <div class="view-header">
+    <div><div class="crumb">Compliance / Legal</div><h2 class="view-title">Policies, terms & conditions</h2><div class="view-sub">Every legal document the platform serves · view, edit, version, and roll back</div></div>
+    <div class="flex gap-2"><button class="btn btn-secondary" onclick="newPolicy()">+ New policy</button><button class="btn btn-primary" onclick="toast('Bulk export prepared','')">Export all</button></div>
+  </div>
+
+  <div class="grid grid-4 mb-4">
+    <div class="kpi"><div class="kpi-label">Active policies</div><div class="kpi-value">8</div><div class="kpi-delta">All markets</div></div>
+    <div class="kpi"><div class="kpi-label">Drafts pending</div><div class="kpi-value" style="color:var(--warning);">2</div><div class="kpi-delta">Awaiting legal sign-off</div></div>
+    <div class="kpi"><div class="kpi-label">Re-consent triggered</div><div class="kpi-value">100%</div><div class="kpi-delta">On version change</div></div>
+    <div class="kpi"><div class="kpi-label">Languages</div><div class="kpi-value">4</div><div class="kpi-delta">EN · Luganda · SW · KR</div></div>
+  </div>
+
+  <div class="card" style="padding:0;">
+    <table class="table">
+      <thead><tr><th>Policy</th><th>Version</th><th>Effective</th><th>Markets</th><th>Languages</th><th>State</th><th></th></tr></thead>
+      <tbody>
+        <tr><td>Privacy Policy</td><td>v3.2</td><td>2026-04-01</td><td>UG · KE · RW</td><td>EN · LG · SW · KR</td><td><span class="badge badge-success">Active</span></td><td><a onclick="editPolicy('privacy')">Edit →</a></td></tr>
+        <tr><td>Consent for KYC processing</td><td>v3.2</td><td>2026-04-01</td><td>UG · KE · RW</td><td>EN · LG · SW · KR</td><td><span class="badge badge-success">Active</span></td><td><a onclick="editPolicy('kyc-consent')">Edit →</a></td></tr>
+        <tr><td>Terms of Use · Agent App</td><td>v2.1</td><td>2026-03-15</td><td>UG · KE · RW</td><td>EN · LG</td><td><span class="badge badge-success">Active</span></td><td><a onclick="editPolicy('agent-tos')">Edit →</a></td></tr>
+        <tr><td>Loan Agreement template</td><td>v4.0</td><td>2026-02-01</td><td>UG</td><td>EN · LG</td><td><span class="badge badge-success">Active</span></td><td><a onclick="editPolicy('loan-uga')">Edit →</a></td></tr>
+        <tr><td>Biometric Data Handling</td><td>v1.3</td><td>2026-04-01</td><td>UG · KE · RW</td><td>EN</td><td><span class="badge badge-success">Active</span></td><td><a onclick="editPolicy('biometric')">Edit →</a></td></tr>
+        <tr><td>Data Residency Statement</td><td>v1.1</td><td>2026-01-12</td><td>UG · KE · RW</td><td>EN</td><td><span class="badge badge-success">Active</span></td><td><a onclick="editPolicy('residency')">Edit →</a></td></tr>
+        <tr><td>Rider Passport · sharing terms</td><td>v1.0</td><td>—</td><td>UG · KE · RW</td><td>EN · LG</td><td><span class="badge badge-warning">Draft · Legal review</span></td><td><a onclick="editPolicy('passport')">Edit →</a></td></tr>
+        <tr><td>Loan Agreement · Kenya</td><td>v1.0</td><td>—</td><td>KE</td><td>EN · SW</td><td><span class="badge badge-warning">Draft</span></td><td><a onclick="editPolicy('loan-ke')">Edit →</a></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="alert alert-info mt-4"><div><strong>Editing rules:</strong> only Compliance / Legal role can publish. All edits are version-stamped, never overwrite the previous version, and trigger re-consent for affected applicants on next login.</div></div>
+`;
+VIEW_INIT['comp-policies'] = ()=>{
+  const SAMPLE_BODIES = {
+    privacy: '# Privacy Policy v3.2\\n\\nEffective 2026-04-01. This policy describes how Spiro collects, uses, and stores personal information of riders applying for asset financing through Spiro and its partner financiers (Union, Watu, SACCOs).\\n\\n## 1. What we collect\\n- Full name, date of birth, NIN, phone, address\\n- Biometric data (face) — used only to verify identity\\n- Application metadata: device fingerprint, geolocation, submission time\\n\\n## 2. How we use it\\nIdentity verification, credit decisioning, fraud prevention, regulatory reporting.\\n\\n## 3. Retention\\nBiometric: 90 days. PII: 7 years. Audit log: 7 years.\\n\\n## 4. Your rights\\nAccess, correction, deletion (where regulation allows), portability via the Rider Passport feature.\\n\\n## 5. Contact\\ndataprotection@spironet.com',
+    'kyc-consent': '# Consent for KYC processing v3.2\\n\\nBy proceeding with this application I agree that Spiro may:\\n\\n1. Verify my National ID (NIN) against the NIRA / IPRS / NIDA database for my market\\n2. Capture my photograph and compare it biometrically against my ID record\\n3. Share validated KYC data with the financier I am applying through (Union MFI Uganda)\\n4. Retain biometric data for up to 90 days after my application closes\\n\\nI confirm I am 18+ and the NIN provided is mine.',
+    'agent-tos': '# Terms of Use · Agent App v2.1\\n\\nThis Agent App is provided to authorised Spiro and Union swap-station agents only. By using it you agree to:\\n\\n- Capture customer data accurately and only with consent\\n- Never enroll a person who is not physically present\\n- Never share your login credentials\\n- Report any suspected fraud via the Manual Ticket flow within 24 hours',
+    biometric: '# Biometric Data Handling v1.3\\n\\nSpiro stores biometric templates (not raw images where possible) for the strict purpose of verifying the identity of an applicant against their National ID. Retention is capped at 90 days from application close, unless regulation requires longer.',
+    passport: '# Rider Passport · sharing terms v1.0 (DRAFT)\\n\\nThe Rider Passport allows a previously-verified rider to skip re-capture when applying through a new Spiro financier partner. Sharing is opt-in per partner and requires fresh SMS consent.',
+    'loan-uga': '# Loan Agreement · Uganda v4.0\\n\\n[Full loan agreement template with EMI schedule, default terms, repossession clauses, and arbitration jurisdiction]',
+    'loan-ke': '# Loan Agreement · Kenya v1.0 (DRAFT)\\n\\n[Kenya-specific loan template aligned with CBK regulations and DPA 2019. Pending review.]',
+    residency: '# Data Residency Statement v1.1\\n\\nSpiro stores customer PII in-market for Uganda, Kenya, and Rwanda. Biometric data is stored in-country where the local regulator requires.'
+  };
+  const TITLES = {
+    privacy:'Privacy Policy', 'kyc-consent':'Consent for KYC processing', 'agent-tos':'Terms of Use · Agent App',
+    biometric:'Biometric Data Handling', passport:'Rider Passport · sharing terms',
+    'loan-uga':'Loan Agreement · Uganda', 'loan-ke':'Loan Agreement · Kenya', residency:'Data Residency Statement'
+  };
+  window.editPolicy = function(id){
+    const body = (SAMPLE_BODIES[id]||'').replace(/\\\\n/g,'\\n');
+    modal('Edit · '+TITLES[id], `
+      <div class="field"><label class="field-label">Title</label><input class="input" value="${TITLES[id]}"></div>
+      <div class="field"><label class="field-label">Markets</label><input class="input" value="UG · KE · RW"></div>
+      <div class="field"><label class="field-label">Languages</label><input class="input" value="EN · LG · SW · KR"></div>
+      <div class="field"><label class="field-label">Body (Markdown supported)</label><textarea class="textarea" rows="12" style="font-family:'Menlo',monospace;font-size:12px;">${body}</textarea></div>
+      <div class="alert alert-warning"><div class="text-xs"><strong>Saving creates a new version.</strong> The previous version is preserved. Re-consent will fire for affected applicants on next login.</div></div>
+      <div class="flex justify-between items-center mt-3">
+        <span class="text-xs muted">Legal sign-off required to publish.</span>
+        <div class="flex gap-2"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-secondary" onclick="toast('Saved as draft','')">Save as draft</button><button class="btn btn-primary" onclick="toast('Published · v new · re-consent triggered','')">Publish</button></div>
+      </div>
+    `, {wide:true});
+  };
+  window.newPolicy = function(){
+    modal('New policy', `
+      <div class="field"><label class="field-label">Title <span class="req">*</span></label><input class="input" placeholder="e.g. Refund Policy"></div>
+      <div class="field"><label class="field-label">Markets</label><div class="flex gap-3"><label><input type="checkbox" checked> Uganda</label><label><input type="checkbox"> Kenya</label><label><input type="checkbox"> Rwanda</label></div></div>
+      <div class="field"><label class="field-label">Body</label><textarea class="textarea" rows="6" placeholder="Markdown supported"></textarea></div>
+      <div class="flex justify-end gap-2 mt-3"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="toast('Policy drafted','')">Create draft</button></div>
+    `);
+  };
+};
 </script>
 
 </body>
