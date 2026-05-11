@@ -492,43 +492,15 @@ VIEWS['agent-dashboard'] = ()=>`
 `;
 VIEW_INIT['agent-dashboard'] = ()=>{
   window.openCase = openCaseModal;
-  window.openTicketModal = function(){
-    modal('Raise manual ticket', `
-      <p class="text-sm muted mb-3">Use this when the online submission isn't working — bad connection, KYC API down, or a customer disputing a decision.</p>
-      <div class="field"><label class="field-label">Case ID (optional)</label><input class="input" id="t_case" placeholder="e.g. CM-0482"></div>
-      <div class="field"><label class="field-label">Reason <span class="req">*</span></label>
-        <select class="select" id="t_reason">
-          <option>KYC API unavailable</option>
-          <option>Customer disputing auto-decline</option>
-          <option>Webhook stuck — Loan ID not issued</option>
-          <option>Biometric capture repeatedly failing</option>
-          <option>Document quality issue</option>
-          <option>Other (describe below)</option>
-        </select>
-      </div>
-      <div class="field"><label class="field-label">Description <span class="req">*</span></label><textarea class="textarea" id="t_desc" rows="3" placeholder="What happened? Add any context the Ops team will need."></textarea></div>
-      <div class="field"><label class="field-label">Priority</label>
-        <select class="select" id="t_pri"><option>Low</option><option selected>Medium</option><option>High · customer waiting</option></select>
-      </div>
-      <div class="flex justify-between items-center mt-3">
-        <span class="text-xs muted">Routes to Ops queue · SLA based on priority</span>
-        <div class="flex gap-2"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="submitTicket()">Submit ticket</button></div>
-      </div>
-    `);
-  };
-  window.submitTicket = function(){
-    const desc = document.getElementById('t_desc').value.trim();
-    if(!desc){ toast('Add a description before submitting','warn'); return; }
-    const id = 'TK-' + Math.floor(Math.random()*9000+1000);
-    closeModal();
-    toast('Ticket '+id+' raised · routed to Ops queue');
-  };
 };
 
 VIEWS['agent-lead'] = ()=>`
   <div class="view-header">
     <div><div class="crumb">Swap Agent · Step A1</div><h2 class="view-title">New lead</h2><div class="view-sub">Basic info before the full CX form · all fields validated in real time</div></div>
-    <span class="badge badge-info">Auto-saved every 30s</span>
+    <div class="flex gap-2 items-center">
+      <span class="badge badge-info">Auto-saved every 30s</span>
+      <button class="btn btn-secondary btn-sm" onclick="openTicketModal()">🎫 Raise manual ticket</button>
+    </div>
   </div>
 
   <div class="card mb-4" style="padding:14px 18px;">
@@ -620,7 +592,10 @@ VIEW_INIT['agent-lead'] = ()=>{
 VIEWS['agent-cx'] = ()=>`
   <div class="view-header">
     <div><div class="crumb">Swap Agent · Step B2</div><h2 class="view-title">CX data form</h2><div class="view-sub">23-field digital form · real-time validation · in-app photo with liveness check</div></div>
-    <span class="badge badge-info">Step 2 of 5</span>
+    <div class="flex gap-2 items-center">
+      <span class="badge badge-info">Step 2 of 5</span>
+      <button class="btn btn-secondary btn-sm" onclick="openTicketModal()">🎫 Raise manual ticket</button>
+    </div>
   </div>
 
   <div class="card" id="cxForm">
@@ -709,7 +684,10 @@ VIEW_INIT['agent-cx'] = ()=>attachValidation('cxForm');
 VIEWS['agent-kyc'] = ()=>`
   <div class="view-header">
     <div><div class="crumb">Swap Agent · Step C3 → D4</div><h2 class="view-title">KYC verification + risk assessment</h2><div class="view-sub">Identity checks, psychographic test, then ML risk score · score is revealed only after all checks complete</div></div>
-    <button class="btn btn-secondary btn-sm" onclick="runKycSim()">▶ Run again</button>
+    <div class="flex gap-2">
+      <button class="btn btn-secondary btn-sm" onclick="openTicketModal({case:'CM-0482',desc:'KYC ran but customer says some details look wrong — '})">🎫 Raise manual ticket</button>
+      <button class="btn btn-secondary btn-sm" onclick="runKycSim()">▶ Run again</button>
+    </div>
   </div>
 
   <div class="card mb-4" id="kycProgressCard">
@@ -1042,7 +1020,12 @@ VIEWS['ops-queue'] = ()=>`
 
 VIEWS['ops-case'] = ()=>`
   <div class="view-header">
-    <div><div class="crumb">Spiro Ops · Review queue</div><h2 class="view-title">CM-0482 · Sarah Namuli</h2><div class="view-sub">Submitted 09:28 · Agent J. Mukasa · Kawempe · SLA in <strong style="color:var(--danger);">22 min</strong></div></div>
+    <div>
+      <div class="flex items-center gap-2 mb-2">
+        <button class="btn btn-ghost btn-sm" onclick="showView('ops-queue', document.querySelector('[data-role=ops] .role-item'))">← Back to queue</button>
+      </div>
+      <div class="crumb">Spiro Ops · Review queue</div><h2 class="view-title">CM-0482 · Sarah Namuli</h2><div class="view-sub">Submitted 09:28 · Agent J. Mukasa · Kawempe · SLA in <strong style="color:var(--danger);">22 min</strong></div>
+    </div>
     <span class="badge badge-warning">Review · SLA 22m</span>
   </div>
 
@@ -1124,6 +1107,35 @@ VIEWS['ops-case'] = ()=>`
 `;
 VIEW_INIT['ops-case'] = ()=>{
   window.opsDecide = function(action){
+    // Approve / Decline require confirmation; Request more info goes through directly
+    if(action === 'approve' || action === 'decline'){
+      opsConfirm(action);
+      return;
+    }
+    opsExecute(action);
+  };
+  window.opsConfirm = function(action){
+    const isApprove = action === 'approve';
+    const title = isApprove ? 'Confirm approval' : 'Confirm decline';
+    const ctaLabel = isApprove ? 'Yes, approve' : 'Yes, decline';
+    const ctaClass = isApprove ? 'btn-primary' : 'btn-danger';
+    const warning = isApprove
+      ? '<strong>This issues a Loan ID immediately</strong> and triggers downpayment + delivery flows. Make sure the KYC + risk factors check out.'
+      : '<strong>This sends a decline SMS to the customer</strong> and locks them out for 14 days. Cannot be undone from this screen — only Ops Manager can override.';
+    modal(title,
+      '<div class="alert ' + (isApprove ? 'alert-success' : 'alert-danger') + '"><div>' + warning + '</div></div>'+
+      '<div class="text-sm mb-3"><strong>Case:</strong> CM-0482 · Sarah Namuli</div>'+
+      '<div class="text-sm mb-3"><strong>Risk score:</strong> 48 / 100 · Review band</div>'+
+      '<div class="field"><label class="text-xs"><input type="checkbox" id="opsConfirmChk"> I have reviewed the AI risk factors and confirm this decision.</label></div>'+
+      '<div class="flex justify-end gap-2 mt-3"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn ' + ctaClass + '" id="opsConfirmBtn" disabled onclick="closeModal();opsExecute(\'' + action + '\')">' + ctaLabel + '</button></div>'
+    );
+    setTimeout(()=>{
+      const chk = document.getElementById('opsConfirmChk');
+      const btn = document.getElementById('opsConfirmBtn');
+      if(chk && btn){ chk.addEventListener('change', ()=>{ btn.disabled = !chk.checked; }); }
+    }, 50);
+  };
+  window.opsExecute = function(action){
     const notes = (document.getElementById('opsNotes')||{}).value || '';
     const map = {
       approve: {
@@ -1509,7 +1521,6 @@ VIEWS['agent-tickets'] = ()=>`
   <div class="alert alert-info mt-4"><div><strong>When to raise a ticket:</strong> KYC API down, biometric won't capture, webhook stuck, customer dispute, or any blocker that prevents normal flow. Routed to Ops queue with priority-based SLA.</div></div>
 `;
 VIEW_INIT['agent-tickets'] = ()=>{
-  window.openTicketModal = window.openTicketModal || function(){ toast('Open the Dashboard first to access ticket form','warn'); };
   window.openCase = openCaseModal;
 };
 
@@ -1877,6 +1888,42 @@ function openCaseModal(id){
   modal('Case '+id+' · '+c.name, '<div class="grid grid-2 gap-3 mb-4"><div class="kpi" style="padding:12px;"><div class="kpi-label" style="font-size:10px;">Status</div><div class="kpi-value" style="font-size:18px;"><span class="badge badge-'+c.stateClass+'">'+c.state+'</span></div></div><div class="kpi" style="padding:12px;"><div class="kpi-label" style="font-size:10px;">Risk score</div><div class="kpi-value" style="font-size:18px;">'+score+'</div></div></div><h5 class="mb-2">Identity</h5><table class="table table-compact mb-3"><tbody><tr><td>NIN</td><td><span class="case-id">'+c.nin+'</span></td></tr><tr><td>Date of birth</td><td>'+c.dob+'</td></tr><tr><td>Phone</td><td>'+c.phone+'</td></tr><tr><td>Sub-county</td><td>'+c.sub+'</td></tr><tr><td>Guarantor</td><td>'+c.guarantor+'</td></tr></tbody></table><h5 class="mb-2">Loan</h5><table class="table table-compact mb-3"><tbody><tr><td>Asset</td><td>'+c.asset+'</td></tr><tr><td>Loan ID</td><td>'+c.loan+'</td></tr><tr><td>Downpayment</td><td>'+c.amt+'</td></tr><tr><td>Monthly income (declared)</td><td>'+c.income+'</td></tr><tr><td>KYC outcome</td><td>'+c.kyc+'</td></tr><tr><td>Psychographic score</td><td>'+c.psych+' / 100</td></tr></tbody></table><div class="flex justify-end gap-2"><button class="btn btn-secondary" onclick="closeModal()">Close</button><button class="btn btn-primary" onclick="toast(\'Full timeline opened (prototype)\',\'\')">View full timeline</button></div>', {wide:true});
 }
 
+/* =================== GLOBAL openTicketModal =================== */
+function openTicketModal(prefill){
+  prefill = prefill || {};
+  modal('Raise manual ticket', `
+    <p class="text-sm muted mb-3">Use this when the online submission isn't working — bad connection, KYC API down, customer disputing a decision, or any blocker.</p>
+    <div class="field"><label class="field-label">Case ID (optional)</label><input class="input" id="t_case" placeholder="e.g. CM-0482" value="${prefill.case||''}"></div>
+    <div class="field"><label class="field-label">Reason <span class="req">*</span></label>
+      <select class="select" id="t_reason">
+        <option>KYC API unavailable</option>
+        <option>Customer disputing auto-decline</option>
+        <option>Webhook stuck — Loan ID not issued</option>
+        <option>Biometric capture repeatedly failing</option>
+        <option>Document quality issue</option>
+        <option>Form data incorrect — needs re-entry</option>
+        <option>Other (describe below)</option>
+      </select>
+    </div>
+    <div class="field"><label class="field-label">Description <span class="req">*</span></label><textarea class="textarea" id="t_desc" rows="3" placeholder="What happened? Context the Ops team will need.">${prefill.desc||''}</textarea></div>
+    <div class="field"><label class="field-label">Priority</label>
+      <select class="select" id="t_pri"><option>Low</option><option selected>Medium</option><option>High · customer waiting</option></select>
+    </div>
+    <div class="flex justify-between items-center mt-3">
+      <span class="text-xs muted">Routes to Ops queue · SLA based on priority</span>
+      <div class="flex gap-2"><button class="btn btn-secondary" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="submitTicket()">Submit ticket</button></div>
+    </div>
+  `);
+}
+function submitTicket(){
+  const desc = (document.getElementById('t_desc')||{}).value || '';
+  if(!desc.trim()){ toast('Add a description before submitting','warn'); return; }
+  const id = 'TK-' + Math.floor(Math.random()*9000+1000);
+  closeModal();
+  toast('Ticket '+id+' raised · routed to Ops queue');
+}
+
+
 function openMobilePreview(){
   modal('Mobile preview · Spiro Connect (Agent App)', `
     <p class="text-sm muted mb-3">This is what the agent sees on the Android app while capturing this customer. Use it to walk the rider through the next steps face-to-face.</p>
@@ -2035,23 +2082,54 @@ VIEW_INIT['super-financiers'] = ()=>{
 
 VIEWS['super-users'] = ()=>`
   <div class="view-header">
-    <div><div class="crumb">Super Admin</div><h2 class="view-title">Users & roles</h2><div class="view-sub">Every account on the platform · cross-tenant view</div></div>
-    <button class="btn btn-primary" onclick="toast('Invite user modal · prototype')">+ Invite user</button>
+    <div><div class="crumb">Super Admin</div><h2 class="view-title">Users & roles</h2><div class="view-sub">Every account on the platform · cross-tenant view · edit role, tenant, or suspend any user</div></div>
+    <button class="btn btn-primary" onclick="userInvite()">+ Invite user</button>
   </div>
   <div class="card" style="padding:0;">
     <table class="table">
       <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Tenant</th><th>Last seen</th><th>State</th><th></th></tr></thead>
       <tbody>
         <tr><td>D. Otieno (you)</td><td>d.otieno@spironet.com</td><td><span class="badge badge-green">Super Admin</span></td><td>Spiro HQ</td><td>Active now</td><td><span class="badge badge-success">Live</span></td><td><a onclick="toast('Cannot edit own account here','warn')">—</a></td></tr>
-        <tr><td>L. Mukasa</td><td>l.mukasa@spironet.com</td><td><span class="badge badge-warning">Ops Manager</span></td><td>Spiro HQ</td><td>4 min ago</td><td><span class="badge badge-success">Live</span></td><td><a onclick="toast('User editor · prototype')">Edit →</a></td></tr>
-        <tr><td>M. Wanjiku</td><td>m.wanjiku@union.ug</td><td><span class="badge badge-info">Financier Admin</span></td><td>Union MFI</td><td>1 hr ago</td><td><span class="badge badge-success">Live</span></td><td><a onclick="toast('User editor · prototype')">Edit →</a></td></tr>
-        <tr><td>A. Ouedraogo</td><td>a.ouedraogo@spironet.com</td><td><span class="badge badge-danger">Compliance</span></td><td>Spiro HQ</td><td>Today 08:14</td><td><span class="badge badge-success">Live</span></td><td><a onclick="toast('User editor · prototype')">Edit →</a></td></tr>
-        <tr><td>J. Mukasa</td><td>j.mukasa@union.ug</td><td><span class="badge">Swap Agent</span></td><td>Union · Kawempe</td><td>11 min ago</td><td><span class="badge badge-success">Live</span></td><td><a onclick="toast('User editor · prototype')">Edit →</a></td></tr>
-        <tr><td>R. Atieno</td><td>r.atieno@spironet.com</td><td><span class="badge">CX Support</span></td><td>Spiro HQ</td><td>Yesterday</td><td><span class="badge badge-warning">Inactive 7d</span></td><td><a onclick="toast('User editor · prototype')">Edit →</a></td></tr>
+        <tr><td>L. Mukasa</td><td>l.mukasa@spironet.com</td><td><span class="badge badge-warning">Ops Manager</span></td><td>Spiro HQ</td><td>4 min ago</td><td><span class="badge badge-success">Live</span></td><td><a onclick="userEdit('L. Mukasa','l.mukasa@spironet.com','ops','Spiro HQ','live')">Edit →</a></td></tr>
+        <tr><td>M. Wanjiku</td><td>m.wanjiku@union.ug</td><td><span class="badge badge-info">Financier Admin</span></td><td>Union MFI</td><td>1 hr ago</td><td><span class="badge badge-success">Live</span></td><td><a onclick="userEdit('M. Wanjiku','m.wanjiku@union.ug','financier','Union MFI','live')">Edit →</a></td></tr>
+        <tr><td>A. Ouedraogo</td><td>a.ouedraogo@spironet.com</td><td><span class="badge badge-danger">Compliance</span></td><td>Spiro HQ</td><td>Today 08:14</td><td><span class="badge badge-success">Live</span></td><td><a onclick="userEdit('A. Ouedraogo','a.ouedraogo@spironet.com','compliance','Spiro HQ','live')">Edit →</a></td></tr>
+        <tr><td>J. Mukasa</td><td>j.mukasa@union.ug</td><td><span class="badge">Swap Agent</span></td><td>Union · Kawempe</td><td>11 min ago</td><td><span class="badge badge-success">Live</span></td><td><a onclick="userEdit('J. Mukasa','j.mukasa@union.ug','agent','Union · Kawempe','live')">Edit →</a></td></tr>
+        <tr><td>R. Atieno</td><td>r.atieno@spironet.com</td><td><span class="badge">CX Support</span></td><td>Spiro HQ</td><td>Yesterday</td><td><span class="badge badge-warning">Inactive 7d</span></td><td><a onclick="userEdit('R. Atieno','r.atieno@spironet.com','cx','Spiro HQ','inactive')">Edit →</a></td></tr>
       </tbody>
     </table>
   </div>
 `;
+VIEW_INIT['super-users'] = ()=>{
+  window.userInvite = function(){
+    modal('Invite user',
+      '<div class="field"><label class="field-label">Full name</label><input class="input" placeholder="e.g. Jane Doe"></div>'+
+      '<div class="field"><label class="field-label">Email</label><input class="input" placeholder="jane@spironet.com"></div>'+
+      '<div class="field"><label class="field-label">Role</label><select class="select"><option>Swap Agent</option><option>Spiro Ops Manager</option><option>CX Support</option><option>Financier Admin</option><option>Compliance / Legal</option><option>Super Admin</option><option>Auditor (read-only)</option></select></div>'+
+      '<div class="field"><label class="field-label">Tenant</label><select class="select"><option>Spiro HQ</option><option>Union MFI · Uganda</option><option>Watu Credit · Kenya</option><option>Inkomoko · Rwanda</option></select></div>'+
+      '<div class="alert alert-info"><div class="text-xs">An invite email is sent immediately. The user lands in a sandbox tenant until they complete first login + 2FA.</div></div>'+
+      '<div class="flex justify-end gap-2 mt-3"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="closeModal();toast(\'Invite sent · audit-logged\')">Send invite</button></div>'
+    );
+  };
+  window.userEdit = function(name, email, role, tenant, state){
+    const ROLE_OPTS = ['Swap Agent','Spiro Ops Manager','CX Support','Financier Admin','Compliance / Legal','Super Admin','Auditor (read-only)'];
+    const TEN_OPTS = ['Spiro HQ','Union MFI · Uganda','Watu Credit · Kenya','Inkomoko · Rwanda'];
+    const roleMap = {agent:'Swap Agent', ops:'Spiro Ops Manager', cx:'CX Support', financier:'Financier Admin', compliance:'Compliance / Legal', super:'Super Admin'};
+    const currentRole = roleMap[role] || role;
+    modal('Edit user · '+name,
+      '<div class="grid grid-2 gap-3">'+
+        '<div class="field"><label class="field-label">Full name</label><input class="input" id="ue_name" value="'+name+'"></div>'+
+        '<div class="field"><label class="field-label">Email</label><input class="input" id="ue_email" value="'+email+'"></div>'+
+        '<div class="field"><label class="field-label">Role</label><select class="select" id="ue_role">'+ROLE_OPTS.map(r=>'<option '+(r===currentRole?'selected':'')+'>'+r+'</option>').join('')+'</select></div>'+
+        '<div class="field"><label class="field-label">Tenant</label><select class="select" id="ue_tenant">'+TEN_OPTS.map(t=>'<option '+(t===tenant?'selected':'')+'>'+t+'</option>').join('')+'</select></div>'+
+      '</div>'+
+      '<div class="field"><label class="field-label">State</label><select class="select" id="ue_state"><option '+(state==='live'?'selected':'')+'>Live · can sign in</option><option '+(state==='inactive'?'selected':'')+'>Inactive · last seen >7d</option><option>Suspended · cannot sign in</option><option>Disabled · departed</option></select></div>'+
+      '<div class="alert alert-warning"><div class="text-xs"><strong>Role changes are audit-logged</strong> and visible in Global audit. Changing role to Super Admin requires a second Super Admin approver.</div></div>'+
+      '<div class="flex justify-between items-center mt-3"><button class="btn btn-danger btn-sm" onclick="closeModal();toast(\''+name+' suspended\', \'warn\')">Suspend user</button>'+
+      '<div class="flex gap-2"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="closeModal();toast(\''+name+' updated · audit-logged\')">Save changes</button></div></div>',
+      {wide:true}
+    );
+  };
+};
 
 VIEWS['super-config'] = ()=>`
   <div class="view-header">
@@ -2079,9 +2157,9 @@ VIEWS['super-config'] = ()=>`
       <table class="table table-compact">
         <thead><tr><th>Financier</th><th>Endpoint</th><th>Success · 24h</th><th></th></tr></thead>
         <tbody>
-          <tr><td>Union MFI</td><td>https://api.union.ug/v2/adara/spiro/cx-onboard</td><td><span class="badge badge-success">99.4%</span></td><td><a onclick="toast('Endpoint editor')">Edit →</a></td></tr>
-          <tr><td>Watu Credit</td><td>https://api.watucredit.com/v3/spiro/inbound</td><td><span class="badge badge-success">99.8%</span></td><td><a onclick="toast('Endpoint editor')">Edit →</a></td></tr>
-          <tr><td>Inkomoko</td><td>https://intake.inkomoko.com/spiro</td><td><span class="badge badge-success">100%</span></td><td><a onclick="toast('Endpoint editor')">Edit →</a></td></tr>
+          <tr><td>Union MFI</td><td>https://api.union.ug/v2/adara/spiro/cx-onboard</td><td><span class="badge badge-success">99.4%</span></td><td><a onclick="endpointEdit('Union MFI','https://api.union.ug/v2/adara/spiro/cx-onboard',99.4)">Edit →</a></td></tr>
+          <tr><td>Watu Credit</td><td>https://api.watucredit.com/v3/spiro/inbound</td><td><span class="badge badge-success">99.8%</span></td><td><a onclick="endpointEdit('Watu Credit','https://api.watucredit.com/v3/spiro/inbound',99.8)">Edit →</a></td></tr>
+          <tr><td>Inkomoko</td><td>https://intake.inkomoko.com/spiro</td><td><span class="badge badge-success">100%</span></td><td><a onclick="endpointEdit('Inkomoko','https://intake.inkomoko.com/spiro',100)">Edit →</a></td></tr>
         </tbody>
       </table>
     </div>
@@ -2133,6 +2211,21 @@ VIEW_INIT['super-config'] = ()=>{
     el.parentElement.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
     el.classList.add('active');
   };
+  window.endpointEdit = function(name, url, success){
+    modal('Edit endpoint · '+name,
+      '<div class="field"><label class="field-label">Tenant</label><input class="input" value="'+name+'" readonly></div>'+
+      '<div class="field"><label class="field-label">Endpoint URL</label><input class="input" id="ep_url" value="'+url+'"></div>'+
+      '<div class="field"><label class="field-label">Auth method</label><select class="select"><option>HMAC-SHA256 signed</option><option>OAuth 2.0 client credentials</option><option>Bearer token</option><option>mTLS</option></select></div>'+
+      '<div class="grid grid-2 gap-3">'+
+        '<div class="field"><label class="field-label">Retry policy override</label><select class="select"><option>Use platform default</option><option>Exponential · max 5</option><option>Fixed 30s · max 3</option></select></div>'+
+        '<div class="field"><label class="field-label">Delivery deadline</label><div class="flex gap-2 items-center"><input class="input" style="width:90px" value="60"><span class="text-xs muted">seconds</span></div></div>'+
+      '</div>'+
+      '<div class="alert alert-info"><div class="text-xs"><strong>Last 24h:</strong> '+success+'% delivery success. Use "Send test webhook" to verify changes before saving.</div></div>'+
+      '<div class="flex justify-between items-center mt-3"><button class="btn btn-secondary btn-sm" onclick="toast(\'Test webhook fired \u00b7 awaiting response\')">Send test webhook</button>'+
+      '<div class="flex gap-2"><button class="btn btn-ghost" onclick="closeModal()">Cancel</button><button class="btn btn-primary" onclick="closeModal();toast(\'Endpoint updated for '+name+' \u00b7 audit-logged\')">Save endpoint</button></div></div>',
+      {wide:true}
+    );
+  };
 };
 
 VIEWS['super-audit'] = ()=>`
@@ -2157,41 +2250,134 @@ VIEWS['super-audit'] = ()=>`
 VIEWS['super-impersonate'] = ()=>`
   <div class="view-header">
     <div><div class="crumb">Super Admin</div><h2 class="view-title">Impersonate user</h2><div class="view-sub">View the portal exactly as another user sees it · audit-logged · auto-expires in 30 min</div></div>
+    <span class="badge badge-warning">High-privilege</span>
   </div>
-  <div class="alert alert-warning"><div><strong>High-privilege action.</strong> Logged in Global audit immediately. Use only for debugging or support.</div></div>
-  <div class="card">
-    <h4 class="mb-3">Pick a user to impersonate</h4>
-    <div class="grid grid-3 gap-3">
-      <div class="card" style="padding:14px;cursor:pointer;" onclick="impersonate('agent')">
-        <div class="text-xs muted fw-600" style="text-transform:uppercase;">Swap Agent</div>
-        <div class="text-sm fw-600 mt-1">J. Mukasa</div>
-        <div class="text-xs muted">Union · Kawempe</div>
-      </div>
-      <div class="card" style="padding:14px;cursor:pointer;" onclick="impersonate('ops')">
-        <div class="text-xs muted fw-600" style="text-transform:uppercase;">Spiro Ops</div>
-        <div class="text-sm fw-600 mt-1">L. Mukasa</div>
-        <div class="text-xs muted">Ops Manager</div>
-      </div>
-      <div class="card" style="padding:14px;cursor:pointer;" onclick="impersonate('financier')">
-        <div class="text-xs muted fw-600" style="text-transform:uppercase;">Financier Admin</div>
-        <div class="text-sm fw-600 mt-1">M. Wanjiku</div>
-        <div class="text-xs muted">Union MFI · UG</div>
-      </div>
-      <div class="card" style="padding:14px;cursor:pointer;" onclick="impersonate('compliance')">
-        <div class="text-xs muted fw-600" style="text-transform:uppercase;">Compliance</div>
-        <div class="text-sm fw-600 mt-1">A. Ouedraogo</div>
-        <div class="text-xs muted">Legal · Spiro HQ</div>
-      </div>
+
+  <div class="alert alert-warning"><div><strong>This is a high-privilege action.</strong> Every impersonation session is recorded in Global audit immediately and exposed to the Compliance role.</div></div>
+
+  <div class="card mb-4">
+    <div class="flex gap-3 items-center">
+      <input class="input" id="impSearch" placeholder="Search by name, email, or phone · e.g. Mukasa / 0772 / wanjiku" style="flex:1;" oninput="impFilter()">
+      <select class="select" id="impRoleFilter" style="width:180px;" onchange="impFilter()">
+        <option value="">All roles</option>
+        <option value="agent">Swap Agent</option>
+        <option value="ops">Spiro Ops</option>
+        <option value="cx">CX Support</option>
+        <option value="financier">Financier Admin</option>
+        <option value="compliance">Compliance / Legal</option>
+        <option value="super">Super Admin</option>
+      </select>
     </div>
+    <div class="text-xs muted mt-2" id="impCount">Showing all users</div>
   </div>
+
+  <div id="impList" class="grid grid-3 gap-3"></div>
+  <div id="impEmpty" style="display:none;padding:32px;text-align:center;color:var(--text-muted);font-size:13px;">No users match this search.</div>
 `;
 VIEW_INIT['super-impersonate'] = ()=>{
-  window.impersonate = function(role){
-    toggleRole(role);
-    const first = document.querySelector('[data-role='+role+'] .role-item');
-    if(first) first.click();
-    toast('Now impersonating · audit-logged','warn');
+  const USERS = [
+    {name:'J. Mukasa',      role:'agent',      roleLabel:'Swap Agent',         tenant:'Union · Kawempe',  email:'j.mukasa@union.ug',     phone:'+256 772 411 098', last:'11 min ago', joined:'2024-09-12', mfa:true,  status:'live',     leads:142, twoFAType:'TOTP'},
+    {name:'D. Asiimwe',     role:'agent',      roleLabel:'Swap Agent',         tenant:'Union · Nakawa',   email:'d.asiimwe@union.ug',    phone:'+256 752 118 044', last:'2 hr ago',  joined:'2024-11-04', mfa:true,  status:'live',     leads:88,  twoFAType:'SMS'},
+    {name:'P. Otieno',      role:'agent',      roleLabel:'Swap Agent',         tenant:'Watu · Mombasa',   email:'p.otieno@watu.ke',      phone:'+254 712 884 110', last:'Today 09:14',joined:'2025-01-22', mfa:true,  status:'live',     leads:201, twoFAType:'TOTP'},
+    {name:'L. Mukasa',      role:'ops',        roleLabel:'Spiro Ops Manager',  tenant:'Spiro HQ',         email:'l.mukasa@spironet.com', phone:'+256 778 222 014', last:'4 min ago', joined:'2024-04-01', mfa:true,  status:'live',     leads:null, twoFAType:'TOTP'},
+    {name:'R. Atieno',      role:'cx',         roleLabel:'CX Support',         tenant:'Spiro HQ',         email:'r.atieno@spironet.com', phone:'+254 720 998 411', last:'Yesterday', joined:'2024-06-18', mfa:true,  status:'inactive', leads:null, twoFAType:'SMS'},
+    {name:'M. Wanjiku',     role:'financier',  roleLabel:'Financier Admin',    tenant:'Union MFI',        email:'m.wanjiku@union.ug',    phone:'+256 779 332 110', last:'1 hr ago',  joined:'2024-09-01', mfa:true,  status:'live',     leads:null, twoFAType:'TOTP'},
+    {name:'K. Mwangi',      role:'financier',  roleLabel:'Financier Admin',    tenant:'Watu Credit',      email:'k.mwangi@watucredit.com',phone:'+254 733 020 449',last:'3 hr ago', joined:'2025-02-10', mfa:true,  status:'live',     leads:null, twoFAType:'TOTP'},
+    {name:'A. Ouedraogo',   role:'compliance', roleLabel:'Compliance / Legal', tenant:'Spiro HQ',         email:'a.ouedraogo@spironet.com',phone:'+256 753 088 222',last:'Today 08:14',joined:'2024-02-14',mfa:true,status:'live',  leads:null, twoFAType:'Yubikey'},
+    {name:'B. Nakato',      role:'compliance', roleLabel:'Compliance / Legal', tenant:'Spiro HQ',         email:'b.nakato@spironet.com', phone:'+256 701 332 411', last:'Yesterday', joined:'2024-08-30', mfa:true,  status:'live',     leads:null, twoFAType:'Yubikey'},
+    {name:'D. Otieno',      role:'super',      roleLabel:'Super Admin',        tenant:'Spiro HQ',         email:'d.otieno@spironet.com', phone:'+254 700 410 220', last:'Active now',joined:'2023-11-01', mfa:true,  status:'live',     leads:null, twoFAType:'Yubikey'},
+    {name:'C. Nyongesa',    role:'agent',      roleLabel:'Swap Agent',         tenant:'Inkomoko · Kigali',email:'c.nyongesa@inkomoko.rw',phone:'+250 788 332 110', last:'5 hr ago',  joined:'2025-06-04', mfa:false, status:'live',     leads:54,  twoFAType:'SMS'},
+    {name:'F. Karangwa',    role:'financier',  roleLabel:'Financier Admin',    tenant:'Inkomoko',         email:'f.karangwa@inkomoko.rw',phone:'+250 789 511 008', last:'Today 07:42',joined:'2025-05-18', mfa:true,  status:'live',     leads:null, twoFAType:'TOTP'}
+  ];
+  window._USERS = USERS;
+
+  function statusBadge(s){
+    if(s==='live')     return '<span class="badge badge-success">Live</span>';
+    if(s==='inactive') return '<span class="badge badge-warning">Inactive 7d</span>';
+    return '<span class="badge badge-danger">Suspended</span>';
+  }
+
+  function roleBadge(role){
+    const map = {agent:'badge', ops:'badge badge-warning', cx:'badge', financier:'badge badge-info', compliance:'badge badge-danger', super:'badge badge-green'};
+    const u = USERS.find(x=>x.role===role);
+    return '<span class="'+(map[role]||'badge')+'">'+(u?u.roleLabel:role)+'</span>';
+  }
+
+  window.impFilter = function(){
+    const q = (document.getElementById('impSearch').value||'').toLowerCase().trim();
+    const r = document.getElementById('impRoleFilter').value;
+    const normalisedQ = q.replace(/[\s+]/g,'');
+    const filtered = USERS.filter(u=>{
+      const hay = (u.name+' '+u.email+' '+u.phone+' '+u.tenant).toLowerCase();
+      const hayNoSpace = hay.replace(/[\s+]/g,'');
+      const matchesQ = !q || hay.includes(q) || hayNoSpace.includes(normalisedQ);
+      const matchesR = !r || u.role === r;
+      return matchesQ && matchesR;
+    });
+    const list = document.getElementById('impList');
+    document.getElementById('impCount').textContent = filtered.length === USERS.length ? 'Showing all '+USERS.length+' users' : 'Showing '+filtered.length+' of '+USERS.length+' users';
+    list.style.display = filtered.length ? 'grid' : 'none';
+    document.getElementById('impEmpty').style.display = filtered.length ? 'none' : 'block';
+
+    list.innerHTML = filtered.map(u=>(
+      '<div class="card" style="padding:14px;display:flex;flex-direction:column;gap:8px;">'+
+        '<div class="flex justify-between items-center">'+roleBadge(u.role)+statusBadge(u.status)+'</div>'+
+        '<a class="text-sm fw-600" style="cursor:pointer;color:var(--spiro-green);" onclick="impQuickView(\''+u.email+'\')">'+u.name+'</a>'+
+        '<div class="text-xs muted">'+u.tenant+'</div>'+
+        '<div class="text-xs muted">'+u.phone+'</div>'+
+        '<div class="text-xs faint">Last seen: '+u.last+'</div>'+
+        '<div class="flex gap-2 mt-1">'+
+          '<button class="btn btn-secondary btn-sm" onclick="impQuickView(\''+u.email+'\')" style="flex:1;">Details</button>'+
+          (u.role==='super' ? '<button class="btn btn-ghost btn-sm" disabled title="Cannot impersonate other Super Admins" style="flex:1;">Impersonate</button>'
+                            : '<button class="btn btn-primary btn-sm" onclick="impStart(\''+u.email+'\')" style="flex:1;">Impersonate</button>')+
+        '</div>'+
+      '</div>'
+    )).join('');
   };
+
+  window.impQuickView = function(email){
+    const u = USERS.find(x=>x.email===email);
+    if(!u){ toast('User not found','warn'); return; }
+    modal('User · '+u.name,
+      '<div class="grid grid-2 gap-3 mb-3">'+
+        '<div class="kpi" style="padding:12px;"><div class="kpi-label" style="font-size:10px;">Role</div><div class="kpi-value" style="font-size:14px;">'+u.roleLabel+'</div></div>'+
+        '<div class="kpi" style="padding:12px;"><div class="kpi-label" style="font-size:10px;">Status</div><div class="kpi-value" style="font-size:14px;">'+statusBadge(u.status)+'</div></div>'+
+      '</div>'+
+      '<table class="table table-compact mb-3"><tbody>'+
+        '<tr><td>Email</td><td>'+u.email+'</td></tr>'+
+        '<tr><td>Phone</td><td>'+u.phone+'</td></tr>'+
+        '<tr><td>Tenant</td><td>'+u.tenant+'</td></tr>'+
+        '<tr><td>Joined</td><td>'+u.joined+'</td></tr>'+
+        '<tr><td>Last seen</td><td>'+u.last+'</td></tr>'+
+        '<tr><td>2FA</td><td>'+(u.mfa?'<span class="badge badge-success">'+u.twoFAType+'</span>':'<span class="badge badge-warning">Not enabled</span>')+'</td></tr>'+
+        (u.leads!==null?'<tr><td>Leads captured</td><td>'+u.leads+'</td></tr>':'')+
+      '</tbody></table>'+
+      '<div class="alert alert-info"><div class="text-xs">All impersonation sessions are audit-logged. Reach out to the user before impersonating where possible.</div></div>'+
+      '<div class="flex justify-between items-center mt-3">'+
+        '<button class="btn btn-secondary btn-sm" onclick="closeModal();showView(\'super-users\', document.querySelectorAll(\'[data-role=super] .role-item\')[2]);toast(\'Jump to Users & roles to edit\')">Edit user →</button>'+
+        '<div class="flex gap-2">'+
+          '<button class="btn btn-ghost" onclick="closeModal()">Close</button>'+
+          (u.role==='super'
+            ? '<button class="btn btn-primary" disabled title="Cannot impersonate Super Admin">Impersonate</button>'
+            : '<button class="btn btn-primary" onclick="closeModal();impStart(\''+u.email+'\')">Impersonate</button>'
+          )+
+        '</div>'+
+      '</div>',
+      {wide:true}
+    );
+  };
+
+  window.impStart = function(email){
+    const u = USERS.find(x=>x.email===email);
+    if(!u){ toast('User not found','warn'); return; }
+    if(u.role==='super'){ toast('Cannot impersonate another Super Admin','warn'); return; }
+    toggleRole(u.role);
+    const first = document.querySelector('[data-role='+u.role+'] .role-item');
+    if(first) first.click();
+    toast('Now impersonating '+u.name+' · audit-logged','warn');
+  };
+
+  impFilter();
 };
 
 </script>
